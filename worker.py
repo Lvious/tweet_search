@@ -54,8 +54,8 @@ if __name__ == '__main__':
             print 'craw_worker process!'
             craw = run_dataset_task(json.loads(queue))
             if craw:
-                db.dataset_log.insert_one({'message':queue,'status':1})
+                db.dataset_log.insert_one({'message':json.loads(queue),'status':1})
             else:
-                db.dataset_log.insert_one({'message':queue,'status':0})
+                db.dataset_log.insert_one({'message':json.loads(queue),'status':0})
         time.sleep(1)
         print 'craw_worker wait!'

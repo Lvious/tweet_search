@@ -12,7 +12,9 @@ client = pymongo.MongoClient('52.91.51.100:27017')
 db = client.tweet
 
 import redis
-rd = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
+r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
+p = r.pubsub()
+p.subscribe('dataset', 'stream')
 
 def advance_search_dataset(q,f,num,event_id):
     collection = db.dataset

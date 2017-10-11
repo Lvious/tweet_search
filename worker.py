@@ -68,17 +68,17 @@ def run_stream_task(message_data):
 if __name__ == '__main__':
     print 'craw_worker start!'
     while True:
-        message = rd.get_message()
+        message = p.get_message()
         if message:
             print 'craw_worker process!'
             if message['channel'] == 'dataset' and message['type'] == 'message':
                 craw = run_dataset_task(message['data'])
                 if craw:
-                    rd.publish('dataset_', 'craw '+message['data']+' success')
+                    p.publish('dataset_', 'craw '+message['data']+' success')
             elif message['channel'] == 'stream' and message['type'] == 'message':
                 craw = run_stream_task(message['data'])
                 if craw:
-                    rd.publish('stream_', 'craw '+message['data']+' success')
+                    p.publish('stream_', 'craw '+message['data']+' success')
             else:
                 pass
         print 'craw_worker wait!'

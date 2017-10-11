@@ -39,7 +39,8 @@ def run_dataset_task(message_data):
             advance_search_dataset(q,message_data['f'],num,event_id)
         else:
             pool = Pool(processes=multiprocessing.cpu_count())
-            [pool.apply_async(advance_search_dataset,(q,f,num,event_id)) for f in message_data['f']]
+            #[pool.apply_async(advance_search_dataset,(q,f,num,event_id)) for f in message_data['f']]
+            [pool.apply(advance_search_dataset,(q,f,num,event_id)) for f in message_data['f']]
             pool.close()
             pool.join()
         return True

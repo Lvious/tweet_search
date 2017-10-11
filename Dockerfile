@@ -4,4 +4,4 @@ ADD . /work
 WORKDIR /work
 RUN pip install -r requirements.txt
 
-CMD ["python" "worker.py"]
+CMD ["python", "worker.py"]

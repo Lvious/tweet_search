@@ -46,4 +46,6 @@ def get_task():
         print message
         r.rpush('task:dataset',json.dumps(message))
 
+if __name__ == '__main__':
+    get_task()
 

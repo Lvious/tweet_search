@@ -42,7 +42,7 @@ def get_task():
     events = db.event_list.find({'event.Date':{'$gt':'2017-09-25 00:00:00'}},{'_id':1,'event.Location':1,'event.Type':1,'event.Date':1})
     for event in events:
         q = get_query_str(event)
-        message = {'q':q,'f':['&f=news','&f=tweets',''],'num':100,'event_id':event['_id']}
+        message = {'q':q,'f':['&f=news','','&f=tweets'],'num':100,'event_id':event['_id']}
         print message
         r.rpush('task:dataset',json.dumps(message))
 

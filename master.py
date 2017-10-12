@@ -10,27 +10,27 @@ import redis
 r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
 def get_location(Location):
-    Location = Location.strip()
     Location = re.sub('[^a-zA-Z ,]','',Location)
     Locations = Location.split(',')
     Locations = [i.strip() for i in Locations]
     Locations.append(Location)
+    Locations = ['"'+i+'"' for i in Locations if ' ' in i] +[i for i in Locations if ' ' not in i]
     return list(set(Locations))
     
 def get_types(Type):
-    Type = Type.strip()
     Type = re.sub('[^a-zA-Z ,]','',Type)
     Types = Type.split(',')
     Types = [i.strip() for i in Types]
     Types.append(Type)
+    Types = ['"'+i+'"' for i in Types if ' ' in i] +[i for i in Types if ' ' not in i]
     return list(set(Types))
 
 
 def get_query_str(event):
     loc =  get_location(event['event']['Location'])
-    loc = set(re.sub(',','',' '.join(loc)).split(' '))
+    #loc = set(re.sub(',','',' '.join(loc)).split(' '))
     trigger = get_types(event['event']['Type'])
-    trigger = set(re.sub(',','',' '.join(trigger)).split(' '))
+    #trigger = set(re.sub(',','',' '.join(trigger)).split(' '))
     date = event['event']['Date']
     temp = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     date_since = (temp - timedelta(days=1)).strftime('%Y-%m-%d')

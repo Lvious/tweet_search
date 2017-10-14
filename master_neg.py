@@ -13,7 +13,7 @@ import redis
 r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
 def get_stopwords():
-    return stopwords_en[random.randint(0,153)]
+    return stopwords_en[random.randint(0,len(stopwords_en)-1)]
 
 
 def get_task():

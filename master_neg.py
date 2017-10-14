@@ -4,7 +4,7 @@ import random
 random.seed(1)
 
 import pymongo
-client = pymongo.MongoClient('52.91.51.100:27017')
+client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
 stopwords_en = db.event_base.find_one({'name':'stopwords_en'})['data']

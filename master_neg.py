@@ -20,7 +20,7 @@ def get_task():
     for item in db.dataset_.find({},{'_id':1}):
         tweet_id = item['_id']
         q = get_stopwords()
-        message = {'q':q,'f':'&f=tweets','num':20,'tweet_id':tweet_id}
+        message = {'q':q,'f':'&f=tweets','num':5,'tweet_id':tweet_id}
         print message
         r.rpush('task:neg',json.dumps(message))
 

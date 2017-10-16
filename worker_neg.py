@@ -22,7 +22,7 @@ refreshCursor_base = 'TWEET-%s-919086151339782146-BD1UO2FFu9QAAAAAAAAVfAAAAAcAAA
 def advance_search_dataset(q,f,num,tweet_id):
     client = pymongo.MongoClient('34.224.37.110:27017')
     db = client.tweet
-    collection = db.neg_
+    collection = db.neg
     tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setMaxTweets(num)
     refreshCursor = refreshCursor_base%(tweet_id)
     tweets = got.manager.TweetManager.getTweets(tweetCriteria,refreshCursor=refreshCursor)
@@ -59,8 +59,8 @@ if __name__ == '__main__':
             print 'craw_worker process!'
             craw = run_neg_task(json.loads(queue))
             if craw:
-                db.neg_log_.insert_one({'message':json.loads(queue),'status':1})
+                db.neg_log.insert_one({'message':json.loads(queue),'status':1})
             else:
-                db.neg_log_.insert_one({'message':json.loads(queue),'status':0})
+                db.neg_log.insert_one({'message':json.loads(queue),'status':0})
         time.sleep(1)
         print 'craw_worker wait!'

@@ -13,16 +13,17 @@ import redis
 r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
 def get_stopwords():
-    return stopwords_en[random.randint(0,len(stopwords_en)-1)]
+	return stopwords_en[random.randint(0,len(stopwords_en)-1)]
 
 
 def get_task():
-    for item in db.dataset.find({},{'_id':1}):
-        tweet_id = item['_id']
-        q = get_stopwords()
-        message = {'q':q,'f':'&f=tweets','num':5,'tweet_id':tweet_id}
-        print message
-        r.rpush('task:neg',json.dumps(message))
+	for item in db.dataset.find({},{'_id':1}):
+		if random.randint(0,1):
+			tweet_id = item['_id']
+			q = get_stopwords()
+			message = {'q':q,'f':'&f=tweets','num':20,'tweet_id':tweet_id}
+			print message
+			r.rpush('task:neg',json.dumps(message))
 
 if __name__ == '__main__':
-    get_task()
+	get_task()

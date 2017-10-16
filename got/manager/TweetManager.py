@@ -139,11 +139,11 @@ class TweetManager:
 			url = url + tweetCriteria.tweetType
 		
 		url = url % (urllib.quote(urlGetData), refreshCursor)
-		ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'
+		ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999))
 
 		headers = [
 			('Host', "twitter.com"),
-			('User-Agent', ua%(random.randint(0,999)), 
+			('User-Agent', ua), 
 			# Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36 
 			#Mozilla/5.0 (Windows NT 6.1; Win64; x64)
 			('Accept', "application/json, text/javascript, */*; q=0.01"),

@@ -7,7 +7,7 @@ import pymongo
 client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
-stopwords_en = db.event_base.find_one({'name':'stopwords_en'})['data']
+stopwords_en = db.event_metadata.find_one({'name':'stopwords_en'})['data']
 
 import redis
 r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
@@ -17,7 +17,7 @@ def get_stopwords():
 
 
 def get_task():
-    for item in db.dataset_.find({},{'_id':1}):
+    for item in db.dataset.find({},{'_id':1}):
         tweet_id = item['_id']
         q = get_stopwords()
         message = {'q':q,'f':'&f=tweets','num':5,'tweet_id':tweet_id}

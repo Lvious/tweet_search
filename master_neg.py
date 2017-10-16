@@ -21,7 +21,7 @@ def get_task():
 		if random.randint(0,1):
 			tweet_id = item['_id']
 			q = get_stopwords()
-			message = {'q':q,'f':'&f=tweets','num':20,'tweet_id':tweet_id}
+			message = {'q':q,'f':'&f=tweets','num':10,'tweet_id':tweet_id}
 			print message
 			r.rpush('task:neg',json.dumps(message))
 

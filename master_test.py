@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 
 import pymongo
 #client = pymongo.MongoClient('101.132.114.125:27017')
-client = pymongo.MongoClient('52.91.51.100:27017')
+client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
 import redis

@@ -92,6 +92,11 @@ class TweetManager:
 				tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
 				tweet.geo = geo
 				
+				if hasattr(tweetCriteria, 'sinceTimeStamp'):
+					if tweet.date < tweetCriteria.sinceTimeStamp:
+						active = False
+						break
+				
 				results.append(tweet)
 				resultsAux.append(tweet)
 				

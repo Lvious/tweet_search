@@ -27,7 +27,11 @@ class TweetCriteria:
 	def setMaxTweets(self, maxTweets):
 		self.maxTweets = maxTweets
 		return self
-
+		
+	def setSinceTimeStamp(self, sinceTimeStamp):
+		self.sinceTimeStamp = sinceTimeStamp
+		return self
+		
 	def setTopTweets(self, topTweets):
 		self.topTweets = topTweets
 		return self

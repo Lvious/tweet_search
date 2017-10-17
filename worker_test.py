@@ -53,6 +53,6 @@ if __name__ == '__main__':
 				run_test_task(json.loads(queue))
 				db.test_log.insert_one({'message':json.loads(queue),'status':1})
 			except Exception,e:
-				db.test_log.insert_one({'message':json.loads(queue),'status':0,'message':e.message})
+				db.test_log.insert_one({'message':json.loads(queue),'status':0,'error':e.message})
 		time.sleep(1)
 		print 'craw_worker wait!'

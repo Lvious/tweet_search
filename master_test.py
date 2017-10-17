@@ -4,15 +4,16 @@ import fire
 from datetime import datetime,timedelta
 
 import pymongo
-client = pymongo.MongoClient('101.132.114.125:27017')
+#client = pymongo.MongoClient('101.132.114.125:27017')
+client = pymongo.MongoClient('52.91.51.100:27017')
 db = client.tweet
 
 import redis
 r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
-location_group_by_char = db1.event_metadata.find_one({'name':'location_group_by_char'})['data']
-type_group_by_char = db1.event_metadata.find_one({'name':'type_group_by_char'})['data']
-freq_users = db1.event_metadata.find_one({'name':'freq_users'})['data']
+location_group_by_char = db.event_metadata.find_one({'name':'location_group_by_char'})['data']
+type_group_by_char = db.event_metadata.find_one({'name':'type_group_by_char'})['data']
+freq_users = db.event_metadata.find_one({'name':'freq_users'})['data']
 
 for loc in location_group_by_char:
 	for i,v in enumerate(loc):

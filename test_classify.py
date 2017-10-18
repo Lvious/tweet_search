@@ -78,12 +78,7 @@ def batch_ftpredict(texts):
 	return results
 	
 	
-def worker(query):
-	ids = []
-	texts = []
-	for i in query:
-		ids.append(i['_id'])
-		texts.append(i['tweet']['text'])
+def worker(ids,texts):
 	probs = batch_ftpredict(texts)
 	for index,id in enumerate(ids):
 		db.test.find_one_and_update({'_id': id,'class':None}, { '$set':{'class':probs[index]}})
@@ -94,7 +89,12 @@ if __name__ == '__main__':
 	pool = Pool(processes=multiprocessing.cpu_count())
 	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	while query.count() != 0:
-		pool.apply(worker,(query,))
+		ids = []
+		texts = []
+		for i in query:
+			ids.append(i['_id'])
+			texts.append(i['tweet']['text'])
+		pool.apply(worker,(ids,texts))
 		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	pool.close()
 	pool.join()

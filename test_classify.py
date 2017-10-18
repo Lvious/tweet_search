@@ -84,7 +84,7 @@ def worker(query):
 		ids.append(i['_id'])
 		texts.append(i['tweet']['text'])
 	probs = batch_ftpredict(texts)
-	for index,_id in enumerate(ids):
+	for index,_id in tqdm(enumerate(ids)):
 		db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':probs[index]}})
 
 if __name__ == '__main__':

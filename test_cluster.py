@@ -12,8 +12,10 @@ from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
+from tqdm import tqdm
+
 def tweet_cluster(X,max_cluster_num=8):
-		count = CountVectorizer()
+		count = CountVectorizer(stop_words='english')
 		X_train_count = count.fit_transform(X)
 		tfidf = TfidfTransformer(use_idf=True)
 		X_train_tfidf = tfidf.fit_transform(X_train_count)
@@ -42,7 +44,7 @@ def kmeans_best(X,X_train_tfidf=None,max_cluster_num=8):
 def get_topics_top_words(model, feature_names, n_top_words=10):
 	topics_top_words = {}
 	for topic_idx, topic in enumerate(model.components_):
-		topics_top_words[topic_idx] [feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]
+		topics_top_words[str(topic_idx)] = [feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]
 	return topics_top_words
   
 if __name__ == '__main__':
@@ -57,9 +59,12 @@ if __name__ == '__main__':
 		for i in query:
 			ids.append(i['_id'])
 			texts.append(i['tweet']['text'])
-		km,lda_words = tweet_cluster(X)
+		if len(ids) == 0:
+			continue
+		km,lda_words = tweet_cluster(texts)
 		clusters = km.labels_
-		requests = [UpdateOne({'_id': _id,'cluster':None}, {'$set': {'cluster':clusters[index],'cluster_hash':cluster_hash}}) for index,_id in tqdm(enumerate(ids))]
+		clusters = [int(i) for i in clusters]
+		requests = [UpdateOne({'_id': _id,'cluster':None}, {'$set': {'cluster':{'cluster_label':clusters[index],'cluster_hash':cluster_hash}}}) for index,_id in tqdm(enumerate(ids))]
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
 		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'topics':lda_words})

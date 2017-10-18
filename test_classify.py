@@ -10,7 +10,9 @@ import multiprocessing
 #from multiprocessing import Pool
 from multiprocessing.dummy import Pool
 
+from pprint import pprint
 import pymongo
+from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
@@ -81,7 +83,7 @@ def batch_ftpredict(texts):
 def worker(prob,_id):
 	db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':prob}})
 
-if __name__ == '__main__':
+if __name__ == '__main__':  #bulk_write
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
 	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1})
@@ -91,9 +93,23 @@ if __name__ == '__main__':
 		ids.append(i['_id'])
 		texts.append(i['tweet']['text'])
 	probs = batch_ftpredict(texts)
-	#pool = Pool(processes=multiprocessing.cpu_count())
-	pool = Pool(processes=48)
-	[pool.apply(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
-	#[pool.apply_async(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
-	pool.close()
-	pool.join()
+	requests = [UpdateOne({'_id': _id,'class':None}, {'$set': {'class':probs[index]}}) for index,_id in tqdm(enumerate(ids))]
+	result = db.test.bulk_write(requests)
+	pprint(result.bulk_api_result)
+	
+# if __name__ == '__main__':
+	# start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
+	# end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
+	# query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1})
+	# ids = []
+	# texts = []
+	# for i in query:
+		# ids.append(i['_id'])
+		# texts.append(i['tweet']['text'])
+	# probs = batch_ftpredict(texts)
+	# #pool = Pool(processes=multiprocessing.cpu_count())
+	# pool = Pool(processes=48)
+	# #[pool.apply(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
+	# [pool.apply_async(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
+	# pool.close()
+	# pool.join()

@@ -14,7 +14,7 @@ client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
 re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
-def ftpredict(texts):
+def ftpredict(texts): #if texts == list :  macro probs
 	if type(texts) != list:
 		texts = [texts]
 	pid = os.getpid()
@@ -45,19 +45,56 @@ def ftpredict(texts):
 	prob_s = sum(prob_s)/np.sum(probs)
 	prob_s = [float(i) for i in prob_s]
 	return dict(zip(['0','1'],prob_s))
-    
-def worker(i):
-	print i['_id']
-	probs = ftpredict(i['tweet']['text'])
-	print probs
-	db.test.find_one_and_update({'_id': i['_id'],'class':None}, { '$set':{'class':probs}})
-	print 'done!'
 
-    
+def batch_ftpredict(texts):
+	if type(texts) != list:
+		texts = [texts]
+	pid = os.getpid()
+	tmf  = '/root/lxp/'+str(pid)+'.txt'
+	with codecs.open(tmf,'w','utf-8') as f:
+		for line in texts:
+			f.write(line+'\n')
+		f.close()
+	p=subprocess.Popen(['/root/lxp/fastText/fasttext',
+						'predict-prob',
+						'/root/lxp/terrorist.simple.bin',
+						tmf,
+						'2'], 
+						shell=False, 
+						stdout=subprocess.PIPE,
+						stderr=subprocess.PIPE)
+	result,error = p.communicate()
+	#print result,error
+	probs = []
+	for line in result.splitlines():
+		prob = re_prob.findall(line)
+		prob = sorted(prob,key=lambda item:item[0])
+		prob = [i[1] for i in prob]
+		prob = np.array(prob,dtype='float32')
+		probs.append(prob)
+	results = []
+	for prob in probs:
+		results.append(dict(zip(['0','1'],prob)))
+	return results
+	
+	
+def worker(query):
+	ids = []
+	texts = []
+	for i in query:
+		ids.append(i['_id'])
+		texts.append(i['tweet']['text'])
+	probs = batch_ftpredict(texts)
+	for index,id in enumerate(ids):
+		db.test.find_one_and_update({'_id': id,'class':None}, { '$set':{'class':probs[index]}})
+
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
 	pool = Pool(processes=multiprocessing.cpu_count())
-	[pool.apply(worker,(i,)) for i in tqdm(db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time}},{'_id':1,'tweet.text':1}))]
+	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
+	while query.count() != 0:
+		pool.apply(worker,(query,))
+		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	pool.close()
 	pool.join()

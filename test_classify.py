@@ -3,12 +3,11 @@ import re
 import time
 from datetime import datetime
 from tqdm import tqdm
-import fire
 import codecs 
 import numpy as np
 import subprocess
 import multiprocessing
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 
 import pymongo
 client = pymongo.MongoClient('34.224.37.110:27017')
@@ -85,19 +84,16 @@ def worker(query):
 		ids.append(i['_id'])
 		texts.append(i['tweet']['text'])
 	probs = batch_ftpredict(texts)
-	for index,_id in tqdm(enumerate(ids)):
+	for index,_id in enumerate(ids):
 		db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':probs[index]}})
-def master():
+
+if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
+	pool = Pool(processes=multiprocessing.cpu_count())
 	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	while query.count() != 0:
-		worker(query)
-		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)       
-def main(processes=8):
-	pool = Pool(processes=processes)
-	[pool.async_apply(master,) for i in range(processes)]
+		pool.apply(worker,(query,))
+		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	pool.close()
 	pool.join()
-if __name__ == '__main__':
-    fire.Fire(main)

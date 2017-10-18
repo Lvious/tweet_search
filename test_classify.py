@@ -7,6 +7,7 @@ import codecs
 import numpy as np
 import subprocess
 import multiprocessing
+#from multiprocessing import Pool
 from multiprocessing.dummy import Pool
 
 import pymongo
@@ -71,14 +72,14 @@ def batch_ftpredict(texts):
 		prob = sorted(prob,key=lambda item:item[0])
 		prob = [i[1] for i in prob]
 		probs.append(prob)
-	results = []
+	probs_dict = []
 	for prob in probs:
-		results.append(dict(zip(['0','1'],prob)))
-	return results
+		probs_dict.append(dict(zip(['0','1'],prob)))
+	return probs_dict
 	
 	
 def worker(prob,_id):
-	db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':prob}})
+	db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':float(prob)}})
 
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
@@ -91,7 +92,8 @@ if __name__ == '__main__':
 		texts.append(i['tweet']['text'])
 	probs = batch_ftpredict(texts)
 	#pool = Pool(processes=multiprocessing.cpu_count())
-	pool = Pool(processes=16)
-	[pool.apply_async(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
+	pool = Pool(processes=48)
+	[pool.apply(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
+	#[pool.apply_async(worker,(probs[index],_id)) for index,_id in tqdm(enumerate(ids))]
 	pool.close()
 	pool.join()

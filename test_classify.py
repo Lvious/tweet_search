@@ -10,8 +10,6 @@ import multiprocessing
 from multiprocessing.dummy import Pool
 
 import pymongo
-client = pymongo.MongoClient('34.224.37.110:27017')
-db = client.tweet
 
 re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
 def ftpredict(texts): #if texts == list :  macro probs
@@ -77,7 +75,7 @@ def batch_ftpredict(texts):
 	return results
 	
 	
-def worker(query):
+def worker(db,query):
 	ids = []
 	texts = []
 	for i in query:
@@ -86,14 +84,30 @@ def worker(query):
 	probs = batch_ftpredict(texts)
 	for index,_id in enumerate(ids):
 		db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':probs[index]}})
+<<<<<<< HEAD
 
 if __name__ == '__main__':
+=======
+		
+def master():
+	client = pymongo.MongoClient('34.224.37.110:27017')
+	db = client.tweet
+>>>>>>> 3c203ef87fbabeb5f557d692636f9afe1ff245d7
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
 	pool = Pool(processes=multiprocessing.cpu_count())
 	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	while query.count() != 0:
+<<<<<<< HEAD
 		pool.apply(worker,(query,))
 		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
+=======
+		worker(db,query)
+		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
+		
+def main(processes=8):
+	pool = Pool(processes=processes)
+	[pool.apply_async(master,) for i in range(processes)]
+>>>>>>> 3c203ef87fbabeb5f557d692636f9afe1ff245d7
 	pool.close()
 	pool.join()

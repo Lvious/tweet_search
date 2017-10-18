@@ -70,7 +70,6 @@ def batch_ftpredict(texts):
 		prob = re_prob.findall(line)
 		prob = sorted(prob,key=lambda item:item[0])
 		prob = [i[1] for i in prob]
-		prob = np.array(prob,dtype='float32')
 		probs.append(prob)
 	results = []
 	for prob in probs:
@@ -78,22 +77,23 @@ def batch_ftpredict(texts):
 	return results
 	
 	
-def worker(ids,texts):
+def worker(query):
+	ids = []
+	texts = []
+	for i in query:
+		ids.append(i['_id'])
+		texts.append(i['tweet']['text'])
 	probs = batch_ftpredict(texts)
-	for index,id in enumerate(ids):
-		db.test.find_one_and_update({'_id': id,'class':None}, { '$set':{'class':probs[index]}})
+	for index,_id in enumerate(ids):
+		db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':probs[index]}})
 
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
+	pool = Pool(processes=multiprocessing.cpu_count())
 	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
 	while query.count() != 0:
-		ids = []
-		texts = []
-		for i in query:
-			ids.append(i['_id'])
-			texts.append(i['tweet']['text'])
-		probs = batch_ftpredict(texts)
-		for index,id in enumerate(ids):
-			db.test.find_one_and_update({'_id': id,'class':None}, { '$set':{'class':probs[index]}})
+		pool.apply(worker,(query,))
 		query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1}).limit(100)
+	pool.close()
+	pool.join()

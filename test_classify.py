@@ -15,6 +15,8 @@ db = client.tweet
 
 re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
 def ftpredict(texts):
+	if type(texts) != list:
+		texts = [texts]
 	pid = os.getpid()
 	tmf  = '/home/ubuntu/lxp/work/'+str(pid)+'.txt'
 	with codecs.open(tmf,'w','utf-8') as f:
@@ -48,13 +50,14 @@ def worker(i):
 	print i['_id']
 	probs = ftpredict(i['tweet']['text'])
 	print probs
-	db.test.find_one_and_update({'_id': i['_id'],'probs':None}, { '$set':{'probs':probs)}})
+	db.test.find_one_and_update({'_id': i['_id'],'class':None}, { '$set':{'class':probs}})
 	print 'done!'
 
     
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
+	pool = Pool(processes=multiprocessing.cpu_count())
 	[pool.apply(worker,(i,)) for i in tqdm(db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time}},{'_id':1,'tweet.text':1}))]
 	pool.close()
 	pool.join()

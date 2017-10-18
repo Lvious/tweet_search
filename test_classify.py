@@ -70,7 +70,7 @@ def batch_ftpredict(texts):
 	for line in result.splitlines():
 		prob = re_prob.findall(line)
 		prob = sorted(prob,key=lambda item:item[0])
-		prob = [i[1] for i in prob]
+		prob = [float(i[1]) for i in prob]
 		probs.append(prob)
 	probs_dict = []
 	for prob in probs:
@@ -79,7 +79,7 @@ def batch_ftpredict(texts):
 	
 	
 def worker(prob,_id):
-	db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':float(prob)}})
+	db.test.find_one_and_update({'_id': _id,'class':None}, { '$set':{'class':prob}})
 
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")

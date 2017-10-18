@@ -2,6 +2,7 @@ import os
 import re
 import time
 from datetime import datetime
+from tqdm import tqdm
 import codecs 
 import numpy as np
 import subprocess
@@ -9,7 +10,7 @@ import multiprocessing
 from multiprocessing.dummy import Pool
 
 import pymongo
-client = pymongo.MongoClient("localhost", 27017)
+client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
 re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
@@ -52,7 +53,8 @@ def worker(i):
 
     
 if __name__ == '__main__':
-	start_time = datetime.strptime('2017-10-02', "%Y-%m-%d")
-	[pool.apply(worker,(i,)) for i in db.test.find({'tweet.date':{'$lt':start_time}},{'_id':1,'tweet.text':1})]
+	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
+	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
+	[pool.apply(worker,(i,)) for i in tqdm(db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time}},{'_id':1,'tweet.text':1}))]
 	pool.close()
 	pool.join()

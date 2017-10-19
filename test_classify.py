@@ -96,6 +96,7 @@ if __name__ == '__main__':  #bulk_write
 	requests = [UpdateOne({'_id': _id,'class':None}, {'$set': {'class':probs[index]}}) for index,_id in tqdm(enumerate(ids))]
 	result = db.test.bulk_write(requests)
 	pprint(result.bulk_api_result)
+	client.close()
 	
 # if __name__ == '__main__':
 	# start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")

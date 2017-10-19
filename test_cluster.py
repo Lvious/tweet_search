@@ -49,11 +49,12 @@ def get_topics_top_words(model, feature_names, n_top_words=10):
   
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01 00:00:00', "%Y-%m-%d %H:%M:%S")
-	hours_ = [(start_time + timedelta(hours=i)) for i in range(72)]
+	hours_ = [(start_time + timedelta(hours=i*6)) for i in range(64)]
 	for hour in tqdm(hours_):
-		end_time = hour + timedelta(hours=1)
-		cluster_hash = hash(hour)+hash(end_time)
-		query = db.test.find({'tweet.date':{'$gt':hour,'$lt':end_time},'cluster':None},{'_id':1,'tweet.text':1})
+		end_time = hour + timedelta(hours=6)
+		#cluster_hash = hash(hour)+hash(end_time)
+		cluster_hash = hash(hour.strftime('%Y-%m-%d %H:%M:%S')+'~'+end_time.strftime('%Y-%m-%d %H:%M:%S'))
+		query = db.test.find({'tweet.date':{'$gte':hour,'$lt':end_time},'class.1':{'$gte':0.5},'cluster':None},{'_id':1,'tweet.text':1})
 		ids = []
 		texts = []
 		for i in query:
@@ -68,3 +69,4 @@ if __name__ == '__main__':
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
 		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'topics':lda_words})
+		client.close()

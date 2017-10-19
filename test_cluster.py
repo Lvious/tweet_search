@@ -68,5 +68,5 @@ if __name__ == '__main__':
 		requests = [UpdateOne({'_id': _id,'cluster':None}, {'$set': {'cluster':{'cluster_label':clusters[index],'cluster_hash':cluster_hash}}}) for index,_id in tqdm(enumerate(ids))]
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
-		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'topics':lda_words})
+		db.cluster_metadata.insert_one({'_id':cluster_hash,'texts_num':len(texts),'start_time':hour,'end_time':end_time,'topics':lda_words})
 		client.close()

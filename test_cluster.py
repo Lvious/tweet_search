@@ -53,7 +53,7 @@ if __name__ == '__main__':
 	for hour in tqdm(hours_):
 		end_time = hour + timedelta(hours=6)
 		#cluster_hash = hash(hour)+hash(end_time)
-		cluster_hash = hash(hour.strftime('%Y-%m-%d %H:%M:%S')+'~'+end_time.strftime('%Y-%m-%d %H:%M:%S'))
+		cluster_hash = str(hash(hour.strftime('%Y-%m-%d %H:%M:%S')+'~'+end_time.strftime('%Y-%m-%d %H:%M:%S')))
 		query = db.test.find({'tweet.date':{'$gte':hour,'$lt':end_time},'class.1':{'$gte':0.5},'cluster':None},{'_id':1,'tweet.text':1})
 		ids = []
 		texts = []

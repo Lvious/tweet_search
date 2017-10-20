@@ -1,5 +1,5 @@
 from datetime import datetime,timedelta
-from collections import Counter
+from collections import Counter,defaultdict
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
@@ -55,12 +55,14 @@ if __name__ == '__main__':
 		end_time = hour + timedelta(hours=1)
 		#cluster_hash = hash(hour)+hash(end_time)
 		cluster_hash = str(hash(hour.strftime('%Y-%m-%d %H:%M:%S')+'~'+end_time.strftime('%Y-%m-%d %H:%M:%S')))
-		query = db.test.find({'tweet.date':{'$gte':hour,'$lt':end_time},'class.1':{'$gte':0.5},'cluster':None},{'_id':1,'tweet.text':1})
+		query = db.test.find({'tweet.date':{'$gte':hour,'$lt':end_time},'class.1':{'$gte':0.5},'cluster':None},{'_id':1,'tweet.text':1,'tweet.hashtags':1})
 		ids = []
 		texts = []
+		hashtags = []
 		for i in query:
 			ids.append(i['_id'])
 			texts.append(i['tweet']['text'])
+			hashtags.append(i['tweet']['hashtags'])
 		if len(ids) == 0:
 			continue
 		km,lda_words = tweet_cluster(texts)
@@ -70,5 +72,9 @@ if __name__ == '__main__':
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
 		clusters_counter = dict(Counter(clusters))
-		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'texts_num':len(texts),'clusters_size':clusters_counter,'topics':lda_words})
+		clusters_hashtags = defaultdict(list)
+		for index,hashtag in enumerate(hashtags):
+			if len(hashtag) > 0:
+				clusters_hashtags[clusters[index]].append(hashtag)
+		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'texts_num':len(texts),'clusters_size':clusters_counter,'clusters_hashtags':clusters_hashtags,'topics':lda_words})
 		client.close()

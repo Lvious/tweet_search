@@ -1,4 +1,5 @@
 from datetime import datetime,timedelta
+from collections import Counter
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
@@ -49,9 +50,9 @@ def get_topics_top_words(model, feature_names, n_top_words=10):
   
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01 00:00:00', "%Y-%m-%d %H:%M:%S")
-	hours_ = [(start_time + timedelta(hours=i*6)) for i in range(64)]
+	hours_ = [(start_time + timedelta(hours=i)) for i in range(24*16)]
 	for hour in tqdm(hours_):
-		end_time = hour + timedelta(hours=6)
+		end_time = hour + timedelta(hours=1)
 		#cluster_hash = hash(hour)+hash(end_time)
 		cluster_hash = str(hash(hour.strftime('%Y-%m-%d %H:%M:%S')+'~'+end_time.strftime('%Y-%m-%d %H:%M:%S')))
 		query = db.test.find({'tweet.date':{'$gte':hour,'$lt':end_time},'class.1':{'$gte':0.5},'cluster':None},{'_id':1,'tweet.text':1})
@@ -68,5 +69,6 @@ if __name__ == '__main__':
 		requests = [UpdateOne({'_id': _id,'cluster':None}, {'$set': {'cluster':{'cluster_label':clusters[index],'cluster_hash':cluster_hash}}}) for index,_id in tqdm(enumerate(ids))]
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
-		db.cluster_metadata.insert_one({'_id':cluster_hash,'texts_num':len(texts),'start_time':hour,'end_time':end_time,'topics':lda_words})
+		clusters_counter = dict(Counter(clusters))
+		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'texts_num':len(texts),'clusters_size':clusters_counter,'topics':lda_words})
 		client.close()

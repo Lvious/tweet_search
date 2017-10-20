@@ -72,9 +72,12 @@ if __name__ == '__main__':
 		result = db.test.bulk_write(requests)
 		pprint(result.bulk_api_result)
 		clusters_counter = dict(Counter(clusters))
+		clusters_counter_ = defaultdict()
+		for k,v in clusters_counter.iteritems():
+			clusters_counter_[str(k)] = v
 		clusters_hashtags = defaultdict(list)
 		for index,hashtag in enumerate(hashtags):
 			if len(hashtag) > 0:
 				clusters_hashtags[str(clusters[index])].append(hashtag)
-		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'texts_num':len(texts),'clusters_size':clusters_counter,'clusters_hashtags':clusters_hashtags,'topics':lda_words})
+		db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':hour,'end_time':end_time,'texts_num':len(texts),'clusters_size':clusters_counter_,'clusters_hashtags':clusters_hashtags,'topics':lda_words})
 		client.close()

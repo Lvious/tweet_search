@@ -86,7 +86,7 @@ def worker(prob,_id):
 if __name__ == '__main__':  #bulk_write
 	start_time = datetime.strptime('2017-10-01', "%Y-%m-%d")
 	end_time = datetime.strptime('2017-10-04', "%Y-%m-%d")
-	query = db.test.find({'tweet.date':{'$gt':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1})
+	query = db.test.find({'tweet.date':{'$gte':start_time,'$lt':end_time},'class':None},{'_id':1,'tweet.text':1})
 	ids = []
 	texts = []
 	for i in query:

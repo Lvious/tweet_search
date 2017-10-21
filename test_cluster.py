@@ -1,3 +1,5 @@
+#docker run -p 9000:9000 --name corenlp -i -t konradstrack/corenlp
+#aliyun  934971
 from datetime import datetime,timedelta
 from collections import Counter,defaultdict
 
@@ -47,7 +49,8 @@ def get_topics_top_words(model, feature_names, n_top_words=10):
 	for topic_idx, topic in enumerate(model.components_):
 		topics_top_words[str(topic_idx)] = [feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]
 	return topics_top_words
-  
+
+
 if __name__ == '__main__':
 	start_time = datetime.strptime('2017-10-01 00:00:00', "%Y-%m-%d %H:%M:%S")
 	hours_ = [(start_time + timedelta(hours=i)) for i in range(24*16)]

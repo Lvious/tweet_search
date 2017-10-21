@@ -31,7 +31,7 @@ def get_ner_openie_sentiment(text):
 
 def batch_ie(texts)
 	ies = []
-	for text in tqdm(texts)£º
+	for text in tqdm(texts):
 		ies.append(get_ner_openie_sentiment(text))
 	return ies
 	

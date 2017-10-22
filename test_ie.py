@@ -17,7 +17,11 @@ def get_ner_openie_sentiment(text):
 						  })
 	sentences = output['sentences']
 	if len(sentences) == 0:
-		return {}
+		return {
+		'sentiment':{},
+		'openie':{},
+		'ner':{},
+				}
 	ners = []
 	openies = []
 	sentiments = []

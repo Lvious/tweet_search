@@ -15,18 +15,25 @@ def get_ner_openie_sentiment(text):
 						  'annotators': 'ner,sentiment,openie',
 						  'outputFormat': 'json',
 						  })
-	for i in output['sentences'][0]['openie']:
-		temp = i.pop('objectSpan')
-		temp = i.pop('relationSpan')
-		temp = i.pop('subjectSpan')
+	sentences = output['sentences']
+	if len(sentences) == 0:
+		return {}
 	ners = []
-	for i in output['sentences'][0]['tokens']:
-		if i['ner'] != u'O':
-			ners.append({i['word']:i['ner']})
+	openies = []
+	sentiments = []
+	for sentence in sentences:
+		for i in sentence['openie']:
+			temp = i.pop('objectSpan')
+			temp = i.pop('relationSpan')
+			temp = i.pop('subjectSpan')
+		openies.extend(sentence['openie'])
+		for i in sentence['tokens']:
+			if i['ner'] != u'O':
+				ners.append({i['word']:i['ner']})
+		sentiments.append((sentence['sentiment'],sentence['sentimentValue']))
 	return {
-		'sentiment':output['sentences'][0]['sentiment'],
-		'sentimentValue':output['sentences'][0]['sentimentValue'],
-		'openie':output['sentences'][0]['openie'],
+		'sentiment':sentiments,
+		'openie':openies,
 		'ner':ners,
 	}
 

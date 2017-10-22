@@ -58,7 +58,7 @@ class TweetManager:
 			if len(json['items_html'].strip()) == 0:
 				break
 
-			refreshCursor = json['min_position']			
+			refreshCursor = json['min_position']
 			tweets = PyQuery(json['items_html'])('div.js-stream-tweet')
 			
 			if len(tweets) == 0:
@@ -86,10 +86,12 @@ class TweetManager:
 				tweet.username = usernameTweet
 				tweet.text = txt
 				tweet.date = datetime.datetime.fromtimestamp(dateSec)
+				#tweet.reply = reply   TO DO
 				tweet.retweets = retweets
 				tweet.favorites = favorites
 				tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
 				tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
+				#tweet.href =          TO DO
 				tweet.geo = geo
 				
 				if hasattr(tweetCriteria, 'sinceTimeStamp'):

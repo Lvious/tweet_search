@@ -4,6 +4,7 @@ nlp = StanfordCoreNLP('http://101.132.182.124:9000')
 from datetime import datetime,timedelta
 from pprint import pprint
 from tqdm import tqdm
+import re
 
 import pymongo
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
@@ -12,7 +13,7 @@ db = client.tweet
 
 def get_ner_openie_sentiment(text):
 	output = nlp.annotate(text, properties={
-						  'annotators': 'ner,sentiment,openie',
+						  'annotators': 'truecase,ner,sentiment,openie',
 						  'outputFormat': 'json',
 						  })
 	sentences = output['sentences']
@@ -44,7 +45,7 @@ def get_ner_openie_sentiment(text):
 def batch_ie(texts):
 	ies = []
 	for text in tqdm(texts):
-		ies.append(get_ner_openie_sentiment(text.encode('utf-8')))
+		ies.append(get_ner_openie_sentiment(re.sub('http.+','',text.encode('utf-8'))))
 	return ies
 	
 if __name__ == '__main__':  #bulk_write

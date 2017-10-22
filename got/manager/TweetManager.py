@@ -85,6 +85,7 @@ class TweetManager:
 				tweet.permalink = 'https://twitter.com' + permalink
 				tweet.username = usernameTweet
 				tweet.text = txt
+				#tweet.clean_text =   TO DO
 				tweet.date = datetime.datetime.fromtimestamp(dateSec)
 				#tweet.reply = reply   TO DO
 				tweet.retweets = retweets

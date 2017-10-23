@@ -2,6 +2,7 @@ from pycorenlp import StanfordCoreNLP
 nlp = StanfordCoreNLP('http://101.132.182.124:9000')
 
 from datetime import datetime,timedelta
+from collections import defaultdict
 from pprint import pprint
 from tqdm import tqdm
 import re
@@ -12,7 +13,9 @@ from pymongo.errors import BulkWriteError
 client = pymongo.MongoClient('34.224.37.110:27017')
 db = client.tweet
 
-def get_ner_list(word,ner):
+import pandas as pd
+
+def get_ner_dict(word,ner):
 	ner_tuple = zip(word,ner)
 	splits = [0]
 	for index,nt in enumerate(ner_tuple):
@@ -26,15 +29,15 @@ def get_ner_list(word,ner):
 		else:
 			temp = nt[1]
 			continue
-	ner_tuple_ = []
+	ner_dict = defaultdict(list)
 	for index,s in enumerate(splits):
 		nt = ner_tuple[splits[index-1]:s]
 		if len(nt) == 0:
 			continue
 		if nt[0][1] != u'O':
-			ner_tuple_.append({' '.join([i[0] for i in nt]):nt[0][1]})
-	return ner_tuple_
-
+			ner_dict[nt[0][1]].append(' '.join([i[0] for i in nt]))
+	return dict(ner_dict)
+	
 def ie_pipeline(text):
 	output = nlp.annotate(text, properties={
 						  'annotators': 'truecase,ner,sentiment,openie',
@@ -72,14 +75,14 @@ def ie_pipeline(text):
 			temp = i.pop('subjectSpan')
 		openies.extend(sentence['openie'])
 		sentiments.append((sentence['sentiment'],sentence['sentimentValue']))
-	ner_list = get_ner_list(words,ners)
+	ner_dict = get_ner_dict(words,ners)
 	return {
 		'word':words,
 		'truecaseText':truecaseTexts,
 		'lemma':lemmas,
 		'pos':poss,
 		'ner':ners,
-		'ner_list':ner_list,
+		'ner_dict':ner_dict,
 		'openie':openies,
 		'sentiment':sentiments,
 	}
@@ -103,8 +106,8 @@ if __name__ == '__main__':  #bulk_write
 	requests = [UpdateOne({'_id': _id,'ie':None}, {'$set': {'ie':ies[index]}}) for index,_id in tqdm(enumerate(ids))]
 	#result = db.test.bulk_write(requests)
 	try:
-		db.test.bulk_write(requests)
+		result = db.test.bulk_write(requests)
+		pprint(result.bulk_api_result)
 	except BulkWriteError as bwe:
 		pprint(bwe.details)
-	pprint(result.bulk_api_result)
 	client.close()

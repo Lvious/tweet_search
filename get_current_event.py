@@ -8,7 +8,7 @@ headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 from pprint import pprint
 import pymongo
 from pymongo import InsertOne
-client = pymongo.MongoClient('101.132.182.124:25027')
+client = pymongo.MongoClient('101.132.182.124:25017')
 db = client.tweet
 
 Portal_url = 'https://en.wikipedia.org/wiki/Portal:Current_events/'

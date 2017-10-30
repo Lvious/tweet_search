@@ -46,6 +46,6 @@ if __name__ == '__main__':
 	event_dicts = []
 	for page_url in tqdm(page_urls):
 		event_dicts.extend(get_events_from_page(page_url))
-	requests_ = [InsertOne({'_id': hash(event_dicts['date']+event_dicts['title']),'event':event_dicts}) for i in tqdm(event_dicts)]
+	requests_ = [InsertOne({'_id': hash(i['date']+i['title']),'event':i}) for i in tqdm(event_dicts)]
 	result = db.current_event.bulk_write(requests_)
 	print(result.bulk_api_result)

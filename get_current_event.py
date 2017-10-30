@@ -1,4 +1,5 @@
 import re
+import random
 from tqdm import tqdm
 
 from bs4 import BeautifulSoup
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 	event_dicts = []
 	for page_url in tqdm(page_urls):
 		event_dicts.extend(get_events_from_page(page_url))
-	requests_ = [InsertOne({'_id': hash(i['date']+i['title']),'event':i}) for i in tqdm(event_dicts)]
+	requests_ = [InsertOne({'_id': hash(i['date']+i['title']+str(random.randint(0,100))),'event':i}) for i in tqdm(event_dicts)]
 	try:
 		result = db.current_event.bulk_write(requests_)
 		pprint(result.bulk_api_result)

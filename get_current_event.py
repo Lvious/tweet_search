@@ -8,6 +8,7 @@ headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/5
 from pprint import pprint
 import pymongo
 from pymongo import InsertOne
+from pymongo.errors import BulkWriteError
 client = pymongo.MongoClient('101.132.182.124:27017')
 db = client.tweet
 
@@ -47,5 +48,9 @@ if __name__ == '__main__':
 	for page_url in tqdm(page_urls):
 		event_dicts.extend(get_events_from_page(page_url))
 	requests_ = [InsertOne({'_id': hash(i['date']+i['title']),'event':i}) for i in tqdm(event_dicts)]
-	result = db.current_event.bulk_write(requests_)
-	print(result.bulk_api_result)
+	try:
+		result = db.test.bulk_write(requests_)
+		pprint(result.bulk_api_result)
+	except BulkWriteError as bwe:
+		pprint(bwe.details)
+	client.close()

@@ -94,12 +94,12 @@ def batch_ie(texts):
 	return ies
 	
 if __name__ == '__main__':
-	query = db.current_event.find({'ie':None},{'_id':1,'tweet.description':1})
+	query = db.current_event.find({'ie':None},{'_id':1,'event.description':1})
 	ids = []
 	texts = []
 	for i in query:
 		ids.append(i['_id'])
-		texts.append(i['tweet']['description'])
+		texts.append(i['event']['description'])
 	ies = batch_ie(texts)
 	requests = [UpdateOne({'_id': _id,'ie':None}, {'$set': {'ie':ies[index]}}) for index,_id in tqdm(enumerate(ids))]
 	try:

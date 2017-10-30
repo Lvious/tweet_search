@@ -49,7 +49,7 @@ if __name__ == '__main__':
 		event_dicts.extend(get_events_from_page(page_url))
 	requests_ = [InsertOne({'_id': hash(i['date']+i['title']),'event':i}) for i in tqdm(event_dicts)]
 	try:
-		result = db.test.bulk_write(requests_)
+		result = db.current_event.bulk_write(requests_)
 		pprint(result.bulk_api_result)
 	except BulkWriteError as bwe:
 		pprint(bwe.details)

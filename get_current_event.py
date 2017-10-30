@@ -33,16 +33,19 @@ def get_events_from_page(page_url):
 		td = t.find('td',attrs={'class':'description'})
 		for type_,ul in zip([dl.get_text() for dl in td.find_all('dl')],[ul for ul in td.find_all('ul',recursive=False)]):
 			for li in ul.find_all('li',recursive=False):
-				events.append({'date':trans_date(date),
-							   'class':type_.strip(),
-							   'title':li.a.get_text(),
-							   'description':li.ul.get_text().strip()})
+				try:
+					events.append({'date':trans_date(date),
+								   'class':type_.strip(),
+								   'title':li.a.get_text(),
+								   'description':li.ul.get_text().strip()})
+				except:
+					pass
 	return events
 	
 if __name__ == '__main__':
 	event_dicts = []
 	for page_url in tqdm(page_urls):
-		event.extend(get_events_from_page(page_url))
+		event_dicts.extend(get_events_from_page(page_url))
 	requests_ = [InsertOne({'_id': hash(event_dicts['date']+event_dicts['title']),'event':event_dicts}) for i in tqdm(event_dicts)]
 	result = db.test.bulk_write(requests_)
 	print(result.bulk_api_result)

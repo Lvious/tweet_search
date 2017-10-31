@@ -36,7 +36,10 @@ def get_ner_dict(word,ner):
 			continue
 		if nt[0][1] != u'O':
 			ner_dict[nt[0][1]].append(' '.join([i[0] for i in nt]))
-	return dict(ner_dict)
+	ner_dict = dict(ner_dict)
+	for k,v in ner_dict.iteritems():
+		ner_dict[k] = list(set(v))
+	return ner_dict
 	
 def get_most_common(items):
 	count = Counter(items)

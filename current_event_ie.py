@@ -119,7 +119,7 @@ if __name__ == '__main__':
 	texts = []
 	for i in query:
 		ids.append(i['_id'])
-		texts.append(i['event']['description']+'. '+clear_description(i['event']['description']))
+		texts.append(i['event']['title']+'. '+clear_description(i['event']['description']))
 	ies = batch_ie(texts)
 	requests = [UpdateOne({'_id': _id,'ie':None}, {'$set': {'ie':ies[index]}}) for index,_id in tqdm(enumerate(ids))]
 	try:

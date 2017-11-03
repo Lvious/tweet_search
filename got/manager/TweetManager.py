@@ -43,7 +43,8 @@ class TweetManager:
 		return tweet
 		
 	@staticmethod
-	def getTweets(tweetCriteria, refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
+	def getTweets(tweetCriteria, refreshCursor='', bulk_write_num=1000, receiveBuffer=None, bufferLength=100, proxy=None):
+		bulk_write_index = 0
 		results = []
 		resultsAux = []
 		cookieJar = cookielib.CookieJar()
@@ -101,6 +102,9 @@ class TweetManager:
 						break
 				
 				results.append(tweet)
+				if len(results[bulk_write_index:bulk_write_index+bulk_write_num]) > bulk_write_num:
+					
+					bulk_write_index += bulk_write_num
 				resultsAux.append(tweet)
 				
 				if receiveBuffer and len(resultsAux) >= bufferLength:

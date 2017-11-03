@@ -1,5 +1,6 @@
 import re
 import random
+from datetime import datetime, timedelta
 from tqdm import tqdm
 
 from bs4 import BeautifulSoup
@@ -16,7 +17,7 @@ db = client.tweet
 Portal_url = 'https://en.wikipedia.org/wiki/Portal:Current_events/'
 years = [2010+i for i in range(8)]
 months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
-page_urls = [Portal_url+m+'_'+str(y) for y in years for m in months][6:]
+page_urls = [Portal_url+m+'_'+str(y) for y in years for m in months][6:-2]
 
 def trans_date(date_str):
 	month = date_str.split('_')[1]
@@ -31,17 +32,27 @@ def get_events_from_page(page_url):
 	tables = soup.find_all('table',attrs={'class':'vevent'})
 	events = []
 	for t in tables:
-		date = t.find_previous_sibling().get('id')
+		try:
+			date = trans_date(t.find_previous_sibling().get('id'))
+		except:
+			date = (datetime.strptime(date,'%Y-%m-%d')+timedelta(days=1)).strftime('%Y-%m-%d')
 		td = t.find('td',attrs={'class':'description'})
-		for type_,ul in zip([dl.get_text() for dl in td.find_all('dl')],[ul for ul in td.find_all('ul',recursive=False)]):
+		if td.dl == None:
+			types = [p.get_text() for p in td.find_all('p',recursive=False)]
+		else:
+			types = [dl.get_text() for dl in td.find_all('dl',recursive=False)]
+		for type_,ul in zip(types,[ul for ul in td.find_all('ul',recursive=False)]):
 			for li in ul.find_all('li',recursive=False):
-				try:
-					events.append({'date':trans_date(date),
+				if li.ul == None:
+					events.append({'date':date,
+							   'class':type_.strip(),
+							   'title':'',
+							   'description':li.get_text().strip()})
+				else:
+					events.append({'date':date,
 								   'class':type_.strip(),
 								   'title':li.a.get_text(),
 								   'description':li.ul.get_text().strip()})
-				except:
-					pass
 	return events
 	
 if __name__ == '__main__':

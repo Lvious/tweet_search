@@ -1,41 +1,115 @@
+#################################################################
 coreNLP konradstrack/corenlp 9000:9000
 spacyapi jgontrum/spacyapi:en 8080:80
 bigdl intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 8888:8888
 redis bitnami/redis:latest 6379:6379
 mongo tutum/mongodb 27017:27017 28017:28017
+#################################################################
+#yum install yum-plugin-downloadonly
+yum -y install docker --downloadonly --downloaddir=.  
+rpm -Uvh --force --nodeps *.rpm
 
-sudo yum install /path/to/package.rpm
+#sudo yum install docker
 sudo systemctl start docker
 
+######################################################################################################### 
+#######docker save rancher/agent:v1.2.6 > agent126.tar                     ##############################
+#######docker load -i agent126.tar                                         ##############################
+#######docker tag rancher/agent:v1.2.6 127.0.0.1:5000/rancher/agent:v1.2.6 ##############################
+#######docker push 127.0.0.1:5000/rancher/agent:v1.2.6                     ##############################
+#########################################################################################################                                                   
+sudo docker save registry:2                        >  registry2.tar 
+               
+sudo docker save rancher/server:stable             >  rancherserverstable.tar                                 
+sudo docker save rancher/agent:v1.2.6              >  rancheragent126.tar          
+sudo docker save rancher/network-manager:v0.7.8    >  ranchernetworkmanager078.tar              
+sudo docker save rancher/net:v0.11.9               >  ranchernet0119.tar             
+sudo docker save rancher/dns:v0.15.3               >  rancherdns0153.tar              
+sudo docker save rancher/metadata:v0.9.4           >  ranchermetadata094.tar          
+sudo docker save rancher/lb-service-haproxy:v0.7.9 >  rancherlbservicehaproxy079.tar             
+sudo docker save rancher/healthcheck:v0.3.3        >  rancherhealthcheck033.tar              
+sudo docker save rancher/scheduler:v0.8.2          >  rancherscheduler082.tar              
+sudo docker save rancher/net:holder                >  ranchernetholder.tar              
 
-docker save rancher/agent:v1.2.6 > agent126.tar
-docker load -i agent126.tar
-docker tag rancher/agent:v1.2.6 127.0.0.1:5000/rancher/agent:v1.2.6
-docker push 127.0.0.1:5000/rancher/agent:v1.2.6
+sudo docker save jgontrum/spacyapi:en                            >  jgontrumspacyapien.tar                           
+sudo docker save dorowu/ubuntu-desktop-lxde-vnc:latest           >  dorowuubuntudesktoplxdevnclatest.tar                  
+sudo docker save bitnami/redis:latest                            >  bitnamiredislatest.tar                                             
+sudo docker save ubuntu:16.04                                    >  ubuntu1604.tar                                   
+sudo docker save jupyter/all-spark-notebook:latest               >  jupyterallsparknotebooklatest.tar                       
+sudo docker save tutum/mongodb:latest                            >  tutummongodblatest.tar                           
+sudo docker save konradstrack/corenlp:latest                     >  konradstrackcorenlplatest.tar                    
+sudo docker save intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 >  intelanalyticsbigdl011spark210u14042.tar
 
-REPOSITORY                       TAG                        
-kong                             latest                     
-postgres                         9.4                        
-registry                         2                          
-jgontrum/spacyapi                en                         
-dorowu/ubuntu-desktop-lxde-vnc   latest                     
-bitnami/redis                    latest                                          
-pgbi/kong-dashboard              v2                                           
-ubuntu                           16.04                      
-jupyter/all-spark-notebook       latest                     
-rancher/server                   stable                                       
-rancher/agent                    v1.2.6                     
-rancher/network-manager          v0.7.8                     
-rancher/net                      v0.11.9                    
-rancher/dns                      v0.15.3                    
-rancher/metadata                 v0.9.4  
-rancher/lb-service-haproxy:v0.7.9                    
-rancher/healthcheck              v0.3.3                     
-rancher/scheduler                v0.8.2                     
-rancher/net                      holder                     
-tutum/mongodb                    latest       
-konradstrack/corenlp             latest                     
-intelanalytics/bigdl             0.1.1-spark2.1.0-u14.04-v2  
-rancher/lb-service-haproxy:v0.7.9      
+#####################################################################################################################
+sudo docker load -i  registry2.tar 
+sudo docker run -d -p 5000:5000 --restart always --name registry registry:2
+ 
+sudo docker load -i  rancherserverstable.tar                                 
+sudo docker load -i  rancheragent126.tar          
+sudo docker load -i  ranchernetworkmanager078.tar              
+sudo docker load -i  ranchernet0119.tar             
+sudo docker load -i  rancherdns0153.tar              
+sudo docker load -i  ranchermetadata094.tar          
+sudo docker load -i  rancherlbservicehaproxy079.tar             
+sudo docker load -i  rancherhealthcheck033.tar              
+sudo docker load -i  rancherscheduler082.tar              
+sudo docker load -i  ranchernetholder.tar              
+ 
+sudo docker load -i  jgontrumspacyapien.tar                           
+sudo docker load -i  dorowuubuntudesktoplxdevnclatest.tar                  
+sudo docker load -i  bitnamiredislatest.tar                                             
+sudo docker load -i  ubuntu1604.tar                                   
+sudo docker load -i  jupyterallsparknotebooklatest.tar                       
+sudo docker load -i  tutummongodblatest.tar                           
+sudo docker load -i  konradstrackcorenlplatest.tar                    
+sudo docker load -i  intelanalyticsbigdl011spark210u14042.tar 
 
-sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable       
+#####################################################################################################################
+sudo docker tag registry:2                                       127.0.0.1:5000/registry:2                        
+                                                          
+sudo docker tag rancher/server:stable                            127.0.0.1:5000/rancher/server:stable             
+sudo docker tag rancher/agent:v1.2.6                             127.0.0.1:5000/rancher/agent:v1.2.6              
+sudo docker tag rancher/network-manager:v0.7.8                   127.0.0.1:5000/rancher/network-manager:v0.7.8    
+sudo docker tag rancher/net:v0.11.9                              127.0.0.1:5000/rancher/net:v0.11.9               
+sudo docker tag rancher/dns:v0.15.3                              127.0.0.1:5000/rancher/dns:v0.15.3               
+sudo docker tag rancher/metadata:v0.9.4                          127.0.0.1:5000/rancher/metadata:v0.9.4           
+sudo docker tag rancher/lb-service-haproxy:v0.7.9                127.0.0.1:5000/rancher/lb-service-haproxy:v0.7.9 
+sudo docker tag rancher/healthcheck:v0.3.3                       127.0.0.1:5000/rancher/healthcheck:v0.3.3        
+sudo docker tag rancher/scheduler:v0.8.2                         127.0.0.1:5000/rancher/scheduler:v0.8.2          
+sudo docker tag rancher/net:holder                               127.0.0.1:5000/rancher/net:holder                
+                                                     
+sudo docker tag jgontrum/spacyapi:en                             127.0.0.1:5000/jgontrum/spacyapi:en                           
+sudo docker tag dorowu/ubuntu-desktop-lxde-vnc:latest            127.0.0.1:5000/dorowu/ubuntu-desktop-lxde-vnc:latest          
+sudo docker tag bitnami/redis:latest                             127.0.0.1:5000/bitnami/redis:latest                           
+sudo docker tag ubuntu:16.04                                     127.0.0.1:5000/ubuntu:16.04                                   
+sudo docker tag jupyter/all-spark-notebook:latest                127.0.0.1:5000/jupyter/all-spark-notebook:latest              
+sudo docker tag tutum/mongodb:latest                             127.0.0.1:5000/tutum/mongodb:latest                           
+sudo docker tag konradstrack/corenlp:latest                      127.0.0.1:5000/konradstrack/corenlp:latest                    
+sudo docker tag intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
+#####################################################################################################################
+sudo docker push  127.0.0.1:5000/registry:2                        
+            
+sudo docker push  127.0.0.1:5000/rancher/server:stable             
+sudo docker push  127.0.0.1:5000/rancher/agent:v1.2.6              
+sudo docker push  127.0.0.1:5000/rancher/network-manager:v0.7.8    
+sudo docker push  127.0.0.1:5000/rancher/net:v0.11.9               
+sudo docker push  127.0.0.1:5000/rancher/dns:v0.15.3               
+sudo docker push  127.0.0.1:5000/rancher/metadata:v0.9.4           
+sudo docker push  127.0.0.1:5000/rancher/lb-service-haproxy:v0.7.9 
+sudo docker push  127.0.0.1:5000/rancher/healthcheck:v0.3.3        
+sudo docker push  127.0.0.1:5000/rancher/scheduler:v0.8.2          
+sudo docker push  127.0.0.1:5000/rancher/net:holder                
+            
+sudo docker push  127.0.0.1:5000/jgontrum/spacyapi:en                           
+sudo docker push  127.0.0.1:5000/dorowu/ubuntu-desktop-lxde-vnc:latest          
+sudo docker push  127.0.0.1:5000/bitnami/redis:latest                           
+sudo docker push  127.0.0.1:5000/ubuntu:16.04                                   
+sudo docker push  127.0.0.1:5000/jupyter/all-spark-notebook:latest              
+sudo docker push  127.0.0.1:5000/tutum/mongodb:latest                           
+sudo docker push  127.0.0.1:5000/konradstrack/corenlp:latest                    
+sudo docker push  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
+
+#####################################################################################################################
+sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable   
+
+#####################################################################################################################    

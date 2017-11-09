@@ -4,7 +4,11 @@ bigdl intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 8888:8888
 redis bitnami/redis:latest 6379:6379
 mongo tutum/mongodb 27017:27017 28017:28017
 
+sudo yum install /path/to/package.rpm
+sudo systemctl start docker
 
+
+docker save rancher/agent:v1.2.6 > agent126.tar
 docker load -i agent126.tar
 docker tag rancher/agent:v1.2.6 127.0.0.1:5000/rancher/agent:v1.2.6
 docker push 127.0.0.1:5000/rancher/agent:v1.2.6
@@ -19,16 +23,19 @@ bitnami/redis                    latest
 pgbi/kong-dashboard              v2                                           
 ubuntu                           16.04                      
 jupyter/all-spark-notebook       latest                     
-rancher/server                   latest                                       
+rancher/server                   stable                                       
 rancher/agent                    v1.2.6                     
 rancher/network-manager          v0.7.8                     
 rancher/net                      v0.11.9                    
 rancher/dns                      v0.15.3                    
-rancher/metadata                 v0.9.4                     
+rancher/metadata                 v0.9.4  
+rancher/lb-service-haproxy:v0.7.9                    
 rancher/healthcheck              v0.3.3                     
 rancher/scheduler                v0.8.2                     
 rancher/net                      holder                     
 tutum/mongodb                    latest       
 konradstrack/corenlp             latest                     
 intelanalytics/bigdl             0.1.1-spark2.1.0-u14.04-v2  
-rancher/lb-service-haproxy:v0.7.9             
+rancher/lb-service-haproxy:v0.7.9      
+
+sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable       

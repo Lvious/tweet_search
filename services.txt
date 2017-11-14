@@ -12,6 +12,8 @@ rpm -Uvh --force --nodeps *.rpm
 #sudo yum install docker
 sudo systemctl start docker
 
+YOUR_INSECURE_HOST=192.168.
+
 ######################################################################################################### 
 #######docker save rancher/agent:v1.2.6 > agent126.tar                     ##############################
 #######docker load -i agent126.tar                                         ##############################
@@ -111,5 +113,9 @@ sudo docker push  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
 
 #####################################################################################################################
 sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable   
+/etc/docker/daemon {"insecure-registries":["YOUR_INSECURE_HOST:5000"]}
 
-#####################################################################################################################    
+##################################################################################################################### 
+boot2docker/profile 
+docker-machine ssh default "echo $'EXTRA_ARGS=\"--insecure-registry <YOUR_INSECURE_HOST>\"' | sudo tee -a /var/lib/boot2docker/profile && sudo /etc/init.d/docker restart"  
+##################################################################################################################### 

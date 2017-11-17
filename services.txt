@@ -2,8 +2,8 @@
 coreNLP konradstrack/corenlp 9000:9000
 spacyapi jgontrum/spacyapi:en 8080:80
 bigdl intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 8888:8888
-redis bitnami/redis:latest 6379:6379
-mongo tutum/mongodb 27017:27017 28017:28017
+redis bitnami/redis:latest 6379:6379  -e ALLOW_EMPTY_PASSWORD=yes  [https://hub.docker.com/r/bitnami/redis/]
+mongo tutum/mongodb 27017:27017 28017:28017  -e AUTH=no             [https://hub.docker.com/r/tutum/mongodb/]
 #################################################################
 #yum install yum-plugin-downloadonly
 yum -y install docker --downloadonly --downloaddir=.  
@@ -11,6 +11,8 @@ rpm -Uvh --force --nodeps *.rpm
 
 #sudo yum install docker
 sudo systemctl start docker
+
+sudo sytemctl disable firewalld 关闭防火墙
 
 YOUR_INSECURE_HOST=192.168.
 
@@ -114,8 +116,10 @@ sudo docker push  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
 #####################################################################################################################
 sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable   
 /etc/docker/daemon {"insecure-registries":["YOUR_INSECURE_HOST:5000"]}
-
+https://www.tuicool.com/articles/yiqyiin  修改镜像源
+curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://504348a5.m.daocloud.io
 ##################################################################################################################### 
 boot2docker/profile 
+/var/lib/boot2docker/profile  --registry-mirror=http://xxx.m.daocloud.io
 docker-machine ssh default "echo $'EXTRA_ARGS=\"--insecure-registry <YOUR_INSECURE_HOST>\"' | sudo tee -a /var/lib/boot2docker/profile && sudo /etc/init.d/docker restart"  
 ##################################################################################################################### 

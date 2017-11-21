@@ -2,10 +2,14 @@
 coreNLP konradstrack/corenlp 9000:9000
 spacyapi jgontrum/spacyapi:en 8080:80
 bigdl intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 8888:8888
+jupyter/all-spark-notebook:latest   
 redis bitnami/redis:latest 6379:6379  -e ALLOW_EMPTY_PASSWORD=yes  [https://hub.docker.com/r/bitnami/redis/]
 mongo tutum/mongodb 27017:27017 28017:28017  -e AUTH=no             [https://hub.docker.com/r/tutum/mongodb/]
+gitlab/gitlab-ce:latest                                             [https://hub.docker.com/r/gitlab/gitlab-ce/]
+lixiepeng/lxp:pypiserver
+lixiepeng/lxp:pypiserver3
 #################################################################
-#yum install yum-plugin-downloadonly
+#yum install yum-plugin-downloadonly   centos离线安装docker
 yum -y install docker --downloadonly --downloaddir=.  
 rpm -Uvh --force --nodeps *.rpm
 
@@ -16,13 +20,13 @@ sudo sytemctl disable firewalld 关闭防火墙
 
 YOUR_INSECURE_HOST=192.168.
 
-######################################################################################################### 
+##############################docker镜像离线部署流程#####################################################
 #######docker save rancher/agent:v1.2.6 > agent126.tar                     ##############################
 #######docker load -i agent126.tar                                         ##############################
 #######docker tag rancher/agent:v1.2.6 127.0.0.1:5000/rancher/agent:v1.2.6 ##############################
 #######docker push 127.0.0.1:5000/rancher/agent:v1.2.6                     ##############################
 #########################################################################################################                                                   
-sudo docker save registry:2                        >  registry2.tar 
+sudo docker save registry:2                        >  registry2.tar                      #导出镜像
                
 sudo docker save rancher/server:stable             >  rancherserverstable.tar                                 
 sudo docker save rancher/agent:v1.2.6              >  rancheragent126.tar          
@@ -46,7 +50,7 @@ sudo docker save intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 >  intelanalyti
 
 #####################################################################################################################
 sudo docker load -i  registry2.tar 
-sudo docker run -d -p 5000:5000 --restart always --name registry registry:2
+sudo docker run -d -p 5000:5000 --restart always --name registry registry:2   #部署私有镜像仓库
  
 sudo docker load -i  rancherserverstable.tar                                 
 sudo docker load -i  rancheragent126.tar          
@@ -57,7 +61,7 @@ sudo docker load -i  ranchermetadata094.tar
 sudo docker load -i  rancherlbservicehaproxy079.tar             
 sudo docker load -i  rancherhealthcheck033.tar              
 sudo docker load -i  rancherscheduler082.tar              
-sudo docker load -i  ranchernetholder.tar              
+sudo docker load -i  ranchernetholder.tar                                    #加载rancher依赖镜像
  
 sudo docker load -i  jgontrumspacyapien.tar                           
 sudo docker load -i  dorowuubuntudesktoplxdevnclatest.tar                  
@@ -69,6 +73,7 @@ sudo docker load -i  konradstrackcorenlplatest.tar
 sudo docker load -i  intelanalyticsbigdl011spark210u14042.tar 
 
 #####################################################################################################################
+                                                                                                   # 标记镜像
 sudo docker tag registry:2                                       127.0.0.1:5000/registry:2                        
                                                           
 sudo docker tag rancher/server:stable                            127.0.0.1:5000/rancher/server:stable             
@@ -91,7 +96,7 @@ sudo docker tag tutum/mongodb:latest                             127.0.0.1:5000/
 sudo docker tag konradstrack/corenlp:latest                      127.0.0.1:5000/konradstrack/corenlp:latest                    
 sudo docker tag intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
 #####################################################################################################################
-sudo docker push  127.0.0.1:5000/registry:2                        
+sudo docker push  127.0.0.1:5000/registry:2                                                     # 推送镜像到私有仓库
             
 sudo docker push  127.0.0.1:5000/rancher/server:stable             
 sudo docker push  127.0.0.1:5000/rancher/agent:v1.2.6              
@@ -114,9 +119,9 @@ sudo docker push  127.0.0.1:5000/konradstrack/corenlp:latest
 sudo docker push  127.0.0.1:5000/intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2
 
 #####################################################################################################################
-sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable   
+sudo docker run -d --restart=unless-stopped -p 8080:8080 rancher/server:stable                      #修改镜像源
 /etc/docker/daemon {"insecure-registries":["YOUR_INSECURE_HOST:5000"]}
-https://www.tuicool.com/articles/yiqyiin  修改镜像源
+https://www.tuicool.com/articles/yiqyiin  
 curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://504348a5.m.daocloud.io
 ##################################################################################################################### 
 boot2docker/profile 

@@ -105,7 +105,8 @@ class TweetManager:
 	@staticmethod
 	def getTweetsById(tweet_id):
 		url = 'https://twitter.com/xxx/status/%s'%(tweet_id)
-		tweets = PyQuery(url)('div.js-original-tweet')
+		headers  = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999))}
+		tweets = PyQuery(url,headers=headers)('div.js-original-tweet')
 		for tweetHTML in tweets:
 			return getTweet(tweetHTML)
 		
@@ -124,8 +125,12 @@ class TweetManager:
 			json = TweetManager.getJsonReponse(tweetCriteria, refreshCursor, cookieJar, proxy)
 			if len(json['items_html'].strip()) == 0:
 				break
-
+			
+			if not json.has_key('min_position'):
+				break
 			refreshCursor = json['min_position']
+			if refreshCursor == None:
+				break
 			tweets = PyQuery(json['items_html'])('div.js-stream-tweet')
 			
 			if len(tweets) == 0:

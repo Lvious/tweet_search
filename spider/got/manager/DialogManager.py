@@ -3,14 +3,16 @@ from .. import models
 from pyquery import PyQuery
 import random
 random.seed(1)
+import pdb
 
 #import TweetManager,getTweet
 from TweetManager import TweetManager,getTweet
 
 def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
 	results = {}
-	results['original'] = original
+	results['original'] = original.__dict__
 	results['conversation'] = []
+	pdb.set_trace()
 	resultsAux = []
 	cookieJar = cookielib.CookieJar()
 	
@@ -21,7 +23,11 @@ def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuff
 		if len(json['items_html'].strip()) == 0:
 			break
 
+		if not json.has_key('min_position'):
+			break
 		refreshCursor = json['min_position']
+		if refreshCursor == None:
+			break
 		items = PyQuery(json['items_html'])('ol.stream-items')
 		
 		if len(items) == 0:
@@ -30,7 +36,7 @@ def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuff
 		for item in items:
 			tweets = []
 			for tweet in PyQuery(item)('div.js-stream-tweet'):
-				tweets.append(getTweet(tweet))
+				tweets.append(getTweet(tweet.__dict__))
 				
 			results['conversation'].append(tweets)
 			#resultsAux.append(tweets)

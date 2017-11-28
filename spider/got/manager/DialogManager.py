@@ -3,115 +3,47 @@ from .. import models
 from pyquery import PyQuery
 import random
 random.seed(1)
-import pdb
 
-def fetch_entities(tweetPQ):
-	
-	hashtags = []
-	urls = []
-	for url in tweetPQ('p.js-tweet-text a'):
-		d = dict(url.items())
-		if d.has_key('data-expanded-url'): #d['class'] == 'twitter-timeline-link' 
-			pdb.set_trace()
-			urls.append({'href':d['href'],'expanded_url':d['data-expanded-url']})
-		if d['href'].startswith('/hashtag/'):
-			hashtags.append(d['href'].split('?')[0].split('/')[-1])
-	tweetPQ('p.js-tweet-text a.twitter-timeline-link').remove()
-	return hashtags,urls
-
-def getTweet(tweetHTML):
-	tweetPQ = PyQuery(tweetHTML)
-	tweet = models.Tweet()
-	
-	#base info
-	id = tweetPQ.attr("data-tweet-id")
-	retweet_id = tweetPQ.attr('data-retweet-id')
-	retweeter = tweetPQ.attr('data-retweeter')
-	conversation_id = tweetPQ.attr('data-conversation-id')
-	#permalink = tweetPQ.attr("data-permalink-path")
-	dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"))
-	
-	#user
-	user_screen_name = tweetPQ.attr('data-screen-name')
-	user_id = tweetPQ.attr('data-user-id')
-	
-	#text
-	hashtags,urls = fetch_entities(tweetPQ)
-	mentions = tweetPQ.attr("data-mentions")
-	lang = tweetPQ("p.js-tweet-text").attr('lang')
-	raw_text = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'))
-	standard_text = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '').replace('@ ', ''))
-	tweetPQ('p.js-tweet-text')('a').remove()
-	tweetPQ('p.js-tweet-text')('img').remove()
-	clean_text = tweetPQ("p.js-tweet-text").text()
-	
-	#media
-	quote_id = tweetPQ('div.QuoteTweet a.QuoteTweet-link').attr('data-conversation-id')
-	has_cards = tweetPQ.attr('data-has-cards')
-	card_url = tweetPQ('div.js-macaw-cards-iframe-container').attr('data-card-url')
-	img_src = tweetPQ('div.AdaptiveMedia-container img').attr('src')
-	video_src = tweetPQ('div.AdaptiveMedia-container video').attr('src')
-	
-	#count
-	replies = int(tweetPQ("span.ProfileTweet-action--reply span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-	favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-
-	#geo
-	geo = ''
-	geoSpan = tweetPQ('span.Tweet-geo')
-	if len(geoSpan) > 0:
-		geo = geoSpan.attr('title')
-	
-	## tweet model
-	
-	tweet.id = id
-	tweet.retweet_id = retweet_id
-	tweet.retweeter = retweeter
-	tweet.is_retweet = True if tweet.retweet_id != None else False
-	tweet.conversation_id = conversation_id
-	tweet.is_reply = tweet.id != tweet.conversation_id
-	#tweet.permalink = 'https://twitter.com' + permalink
-	tweet.created_at = datetime.datetime.fromtimestamp(dateSec)
-	
-	tweet.username = user_screen_name
-	tweet.uid = user_id
-	
-	tweet.quote_id = quote_id
-	tweet.has_cards = has_cards
-	tweet.card_url = card_url
-	tweet.img_src = img_src
-	tweet.video_src = video_src
-	
-	tweet.hashtags = hashtags
-	tweet.urls = urls
-	tweet.mentions = mentions.split(' ') if mentions != None else None
-	tweet.lang = lang
-	tweet.raw_text = raw_text
-	tweet.standard_text = standard_text
-	#tweet.clean_text = clean_text
-	
-	tweet.replies = replies
-	tweet.retweets = retweets
-	tweet.favorites = favorites
-
-	tweet.geo = geo
-	return tweet
-
-class TweetManager:
+class DialogManager:
 	
 	def __init__(self):
 		pass
 		
 	@staticmethod
-	def getTweetsById(tweet_id):
+	def getDialogById(tweet_id):
 		url = 'https://twitter.com/xxx/status/%s'%(tweet_id)
 		tweets = PyQuery(url)('div.js-original-tweet')
 		for tweetHTML in tweets:
-			return getTweet(tweetHTML)
+			tweetPQ = PyQuery(tweetHTML)
+			tweet = models.Tweet()
+
+			usernameTweet = tweetPQ("span:first.username.u-dir b").text();
+			txt = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'));
+			retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
+			favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
+			dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"));
+			id = tweetPQ.attr("data-tweet-id");
+			permalink = tweetPQ.attr("data-permalink-path");
+
+			geo = ''
+			geoSpan = tweetPQ('span.Tweet-geo')
+			if len(geoSpan) > 0:
+				geo = geoSpan.attr('title')
+
+			tweet.id = id
+			tweet.permalink = 'https://twitter.com' + permalink
+			tweet.username = usernameTweet
+			tweet.text = txt
+			tweet.date = datetime.datetime.fromtimestamp(dateSec)
+			tweet.retweets = retweets
+			tweet.favorites = favorites
+			tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
+			tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
+			tweet.geo = geo
+		return tweet
 		
 	@staticmethod
-	def getTweets(tweetCriteria, refreshCursor='', bulk_write_num=1000, receiveBuffer=None, bufferLength=100, proxy=None):
+	def getDialogs(tweetCriteria, refreshCursor='', bulk_write_num=1000, receiveBuffer=None, bufferLength=100, proxy=None):
 		bulk_write_index = 0
 		results = []
 		resultsAux = []
@@ -134,9 +66,38 @@ class TweetManager:
 				break
 			
 			for tweetHTML in tweets:
-				tweet = getTweet(tweetHTML)
+				tweetPQ = PyQuery(tweetHTML)
+				tweet = models.Tweet()
+				
+				usernameTweet = tweetPQ("span:first.username.u-dir b").text();
+				txt = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'));
+				retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
+				favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
+				dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"));
+				id = tweetPQ.attr("data-tweet-id");
+				permalink = tweetPQ.attr("data-permalink-path");
+				
+				geo = ''
+				geoSpan = tweetPQ('span.Tweet-geo')
+				if len(geoSpan) > 0:
+					geo = geoSpan.attr('title')
+				
+				tweet.id = id
+				tweet.permalink = 'https://twitter.com' + permalink
+				tweet.username = usernameTweet
+				tweet.text = txt
+				#tweet.clean_text =   TO DO
+				tweet.date = datetime.datetime.fromtimestamp(dateSec)
+				#tweet.reply = reply   TO DO
+				tweet.retweets = retweets
+				tweet.favorites = favorites
+				tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
+				tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
+				#tweet.href =          TO DO
+				tweet.geo = geo
+				
 				if hasattr(tweetCriteria, 'sinceTimeStamp'):
-					if tweet.created_at < tweetCriteria.sinceTimeStamp:
+					if tweet.date < tweetCriteria.sinceTimeStamp:
 						active = False
 						break
 				

@@ -6,13 +6,12 @@ random.seed(1)
 import pdb
 
 def fetch_entities(tweetPQ):
-	
 	hashtags = []
 	urls = []
 	for url in tweetPQ('p.js-tweet-text a'):
 		d = dict(url.items())
 		if d.has_key('data-expanded-url'): #d['class'] == 'twitter-timeline-link' 
-			pdb.set_trace()
+			#pdb.set_trace()
 			urls.append({'href':d['href'],'expanded_url':d['data-expanded-url']})
 		if d['href'].startswith('/hashtag/'):
 			hashtags.append(d['href'].split('?')[0].split('/')[-1])
@@ -111,8 +110,7 @@ class TweetManager:
 			return getTweet(tweetHTML)
 		
 	@staticmethod
-	def getTweets(tweetCriteria, refreshCursor='', bulk_write_num=1000, receiveBuffer=None, bufferLength=100, proxy=None):
-		bulk_write_index = 0
+	def getTweets(tweetCriteria, refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
 		results = []
 		resultsAux = []
 		cookieJar = cookielib.CookieJar()
@@ -141,10 +139,7 @@ class TweetManager:
 						break
 				
 				results.append(tweet)
-				if len(results[bulk_write_index:bulk_write_index+bulk_write_num]) > bulk_write_num:
-					
-					bulk_write_index += bulk_write_num
-				resultsAux.append(tweet)
+				#resultsAux.append(tweet)
 				
 				if receiveBuffer and len(resultsAux) >= bufferLength:
 					receiveBuffer(resultsAux)

@@ -4,6 +4,46 @@ from pyquery import PyQuery
 import random
 random.seed(1)
 
+#import TweetManager,getTweet
+from TweetManager import TweetManager,getTweet
+
+def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
+	results = {}
+	results['original'] = original
+	results['conversation'] = []
+	resultsAux = []
+	cookieJar = cookielib.CookieJar()
+	
+	active = True
+	
+	while active:
+		json = DialogManager.getJsonReponse(screen_name,conversation_id, refreshCursor, cookieJar, proxy)
+		if len(json['items_html'].strip()) == 0:
+			break
+
+		refreshCursor = json['min_position']
+		items = PyQuery(json['items_html'])('ol.stream-items')
+		
+		if len(items) == 0:
+			break
+		
+		for item in items:
+			tweets = []
+			for tweet in PyQuery(item)('div.js-stream-tweet'):
+				tweets.append(getTweet(tweet))
+				
+			results['conversation'].append(tweets)
+			#resultsAux.append(tweets)
+			
+			if receiveBuffer and len(resultsAux) >= bufferLength:
+				receiveBuffer(resultsAux)
+				resultsAux = []
+			
+	if receiveBuffer and len(resultsAux) > 0:
+		receiveBuffer(resultsAux)
+	
+	return results
+	
 class DialogManager:
 	
 	def __init__(self):
@@ -11,40 +51,17 @@ class DialogManager:
 		
 	@staticmethod
 	def getDialogById(tweet_id):
-		url = 'https://twitter.com/xxx/status/%s'%(tweet_id)
-		tweets = PyQuery(url)('div.js-original-tweet')
-		for tweetHTML in tweets:
-			tweetPQ = PyQuery(tweetHTML)
-			tweet = models.Tweet()
-
-			usernameTweet = tweetPQ("span:first.username.u-dir b").text();
-			txt = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'));
-			retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-			favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-			dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"));
-			id = tweetPQ.attr("data-tweet-id");
-			permalink = tweetPQ.attr("data-permalink-path");
-
-			geo = ''
-			geoSpan = tweetPQ('span.Tweet-geo')
-			if len(geoSpan) > 0:
-				geo = geoSpan.attr('title')
-
-			tweet.id = id
-			tweet.permalink = 'https://twitter.com' + permalink
-			tweet.username = usernameTweet
-			tweet.text = txt
-			tweet.date = datetime.datetime.fromtimestamp(dateSec)
-			tweet.retweets = retweets
-			tweet.favorites = favorites
-			tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
-			tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
-			tweet.geo = geo
-		return tweet
-		
+		tweet = TweetManager.getTweetsById(tweet_id)
+		if not tweet.is_reply or tweet.replies > 0:
+			return getDialog(tweet,tweet.username,tweet.conversation_id)
+		elif tweet.is_reply:
+			tweet = TweetManager.getTweetsById(tweet.conversation_id)
+			return getDialog(tweet,tweet.username,tweet.conversation_id)
+		else:
+			return tweet
+			
 	@staticmethod
-	def getDialogs(tweetCriteria, refreshCursor='', bulk_write_num=1000, receiveBuffer=None, bufferLength=100, proxy=None):
-		bulk_write_index = 0
+	def getDialogs(tweetCriteria, refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
 		results = []
 		resultsAux = []
 		cookieJar = cookielib.CookieJar()
@@ -66,46 +83,15 @@ class DialogManager:
 				break
 			
 			for tweetHTML in tweets:
-				tweetPQ = PyQuery(tweetHTML)
-				tweet = models.Tweet()
-				
-				usernameTweet = tweetPQ("span:first.username.u-dir b").text();
-				txt = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'));
-				retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-				favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-				dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"));
-				id = tweetPQ.attr("data-tweet-id");
-				permalink = tweetPQ.attr("data-permalink-path");
-				
-				geo = ''
-				geoSpan = tweetPQ('span.Tweet-geo')
-				if len(geoSpan) > 0:
-					geo = geoSpan.attr('title')
-				
-				tweet.id = id
-				tweet.permalink = 'https://twitter.com' + permalink
-				tweet.username = usernameTweet
-				tweet.text = txt
-				#tweet.clean_text =   TO DO
-				tweet.date = datetime.datetime.fromtimestamp(dateSec)
-				#tweet.reply = reply   TO DO
-				tweet.retweets = retweets
-				tweet.favorites = favorites
-				tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
-				tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
-				#tweet.href =          TO DO
-				tweet.geo = geo
-				
+				tweet = getTweet(tweetHTML)
 				if hasattr(tweetCriteria, 'sinceTimeStamp'):
-					if tweet.date < tweetCriteria.sinceTimeStamp:
+					if tweet.created_at < tweetCriteria.sinceTimeStamp:
 						active = False
 						break
 				
-				results.append(tweet)
-				if len(results[bulk_write_index:bulk_write_index+bulk_write_num]) > bulk_write_num:
-					
-					bulk_write_index += bulk_write_num
-				resultsAux.append(tweet)
+				dialog = DialogManager.getDialogById(tweet.id)
+				results.append(dialog)
+				resultsAux.append(dialog)
 				
 				if receiveBuffer and len(resultsAux) >= bufferLength:
 					receiveBuffer(resultsAux)
@@ -120,37 +106,11 @@ class DialogManager:
 			receiveBuffer(resultsAux)
 		
 		return results
-	
+		
 	@staticmethod
-	def getJsonReponse(tweetCriteria, refreshCursor, cookieJar, proxy):
-		url = "https://twitter.com/i/search/timeline?q=%s&src=typd&max_position=%s"
-		
-		urlGetData = ''
-		
-		if hasattr(tweetCriteria, 'username'):
-			urlGetData += ' from:' + tweetCriteria.username
-		
-		if hasattr(tweetCriteria, 'querySearch'):
-			urlGetData += ' ' + tweetCriteria.querySearch
-		
-		if hasattr(tweetCriteria, 'near'):
-			urlGetData += "&near:" + tweetCriteria.near + " within:" + tweetCriteria.within
-		
-		if hasattr(tweetCriteria, 'since'):
-			urlGetData += ' since:' + tweetCriteria.since
-			
-		if hasattr(tweetCriteria, 'until'):
-			urlGetData += ' until:' + tweetCriteria.until
-		
-
-		if hasattr(tweetCriteria, 'topTweets'):
-			if tweetCriteria.topTweets:
-				url = "https://twitter.com/i/search/timeline?q=%s&src=typd&max_position=%s"
-		
-		if hasattr(tweetCriteria, 'tweetType'):
-			url = url + tweetCriteria.tweetType
-		
-		url = url % (urllib.quote(urlGetData), refreshCursor)
+	def getJsonReponse(screen_name,conversation_id, refreshCursor, cookieJar, proxy):
+		url = 'https://twitter.com/i/%s/conversation/%s?include_available_features=1&include_entities=1&max_position=%s&reset_error_state=false'
+		url = url % (screen_name,urllib.quote(conversation_id), refreshCursor)
 		ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999))
 
 		headers = [
@@ -175,7 +135,7 @@ class DialogManager:
 			response = opener.open(url)
 			jsonResponse = response.read()
 		except Exception,e:
-			print "Twitter weird response. Try to see on browser: https://twitter.com/search?q=%s&src=typd" % urllib.quote(urlGetData)
+			print "Twitter weird response. Try to see on browser:\n"+url
 			raise Exception(e.message)
 			#sys.exit()
 			#return None

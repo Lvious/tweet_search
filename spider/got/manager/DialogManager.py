@@ -3,16 +3,13 @@ from .. import models
 from pyquery import PyQuery
 import random
 random.seed(1)
-import pdb
 
-#import TweetManager,getTweet
 from TweetManager import TweetManager,getTweet
 
 def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):
 	results = {}
 	results['original'] = original.__dict__
 	results['conversation'] = []
-	pdb.set_trace()
 	resultsAux = []
 	cookieJar = cookielib.CookieJar()
 	

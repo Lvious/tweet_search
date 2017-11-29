@@ -1,9 +1,32 @@
 import urllib,urllib2,json,re,datetime,sys,cookielib
 from .. import models
 from pyquery import PyQuery
+import requests
 import random
 random.seed(1)
-import pdb
+
+def fetch_activities(tweet_id):
+	retusers = []
+	favorusers = []
+	re_url = 'https://twitter.com/i/activity/retweeted_popup?id=%s'%(tweet_id)
+	favor_url = 'https://twitter.com/i/activity/favorited_popup?id=%s'%(tweet_id)
+	headers = {
+			'Host':"twitter.com",
+			'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999)),
+			'Accept':"application/json, text/javascript, */*; q=0.01",
+			'Accept-Language':"de,en-US;q=0.7,en;q=0.3",
+			'X-Requested-With':"XMLHttpRequest",
+			'Referer':'https://twitter.com/',
+			'Connection':"keep-alive",
+		}
+	re_users = PyQuery(requests.get(re_url,headers=headers).json()['htmlUsers'])('ol.activity-popup-users')
+	for re_user in re_users('div.account'):
+		retusers.append(PyQuery(re_user).attr('data-screen-name'))
+	favor_users = PyQuery(requests.get(favor_url,headers=headers).json()['htmlUsers'])('ol.activity-popup-users')
+	for favor_user in favor_users('div.account'):
+		favorusers.append(PyQuery(favor_user).attr('data-screen-name'))
+		
+	return retusers,favorusers
 
 def fetch_entities(tweetPQ):
 	hashtags = []
@@ -36,6 +59,7 @@ def getTweet(tweetHTML):
 	
 	#text
 	hashtags,urls = fetch_entities(tweetPQ)
+	retusers,favorusers = fetch_activities(id)
 	mentions = tweetPQ.attr("data-mentions")
 	lang = tweetPQ("p.js-tweet-text").attr('lang')
 	raw_text = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'))
@@ -84,6 +108,8 @@ def getTweet(tweetHTML):
 	
 	tweet.hashtags = hashtags
 	tweet.urls = urls
+	tweet.retusers = retusers
+	tweet.favorusers = favorusers
 	tweet.mentions = mentions.split(' ') if mentions != None else None
 	tweet.lang = lang
 	tweet.raw_text = raw_text
@@ -105,8 +131,16 @@ class TweetManager:
 	@staticmethod
 	def getTweetsById(tweet_id):
 		url = 'https://twitter.com/xxx/status/%s'%(tweet_id)
-		headers  = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999))}
-		tweets = PyQuery(url,headers=headers)('div.js-original-tweet')
+		headers = {
+			'Host':"twitter.com",
+			'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999)),
+			'Accept':"application/json, text/javascript, */*; q=0.01",
+			'Accept-Language':"de,en-US;q=0.7,en;q=0.3",
+			'X-Requested-With':"XMLHttpRequest",
+			'Referer':'https://twitter.com/',
+			'Connection':"keep-alive",
+		}
+		tweets = PyQuery(requests.get(url,headers=headers).content)('div.js-original-tweet')
 		for tweetHTML in tweets:
 			return getTweet(tweetHTML)
 		

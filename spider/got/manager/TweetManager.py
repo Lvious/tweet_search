@@ -209,7 +209,7 @@ class TweetManager:
 						active = False
 						break
 				
-				results.append(tweet)
+				results.append(tweet.__dict__)
 				#resultsAux.append(tweet)
 				
 				if receiveBuffer and len(resultsAux) >= bufferLength:

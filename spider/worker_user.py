@@ -1,26 +1,15 @@
-import sys
-if sys.version_info[0] < 3:
-	import got
-else:
-	import got3 as got
-    
 import time
 import json
     
 import multiprocessing
 from multiprocessing import Pool
 
-import pymongo
-client = pymongo.MongoClient('101.132.187.45:27017')
-db = client.twitter
-
-import redis
-r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
+from Config import get_config
+got,db,r = get_config()
 
 
 def advance_search_test(type_id,q,f,num):
-	client = pymongo.MongoClient('101.132.187.45:27017')
-	db = client.twitter
+	_,db,_ = get_config()
 	collection = [db.Entertainment,db.Religion,db.Sport,db.Military,db.Politics,db.Education,db.Technology,db.Economy,db.Agriculture][type_id-1]
 	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setMaxTweets(num)
 	tweets = got.manager.TweetManager.getTweets(tweetCriteria)

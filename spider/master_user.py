@@ -4,13 +4,8 @@ import fire
 from tqdm import tqdm
 from datetime import datetime,timedelta
 
-import pymongo
-client = pymongo.MongoClient('101.132.187.45:27017')
-db = client.twitter
-
-import redis
-r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
-
+from Config import get_config
+_,db,r = get_config()
 
 def get_task():
 	for type_id in tqdm(range(10)[1:]):

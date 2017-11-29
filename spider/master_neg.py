@@ -3,14 +3,10 @@ import json
 import random
 random.seed(1)
 
-import pymongo
-client = pymongo.MongoClient('34.224.37.110:27017')
-db = client.tweet
+from Config import get_config
+_,db,r = get_config()
 
 stopwords_en = db.event_metadata.find_one({'name':'stopwords_en'})['data']
-
-import redis
-r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
 def get_stopwords():
 	return stopwords_en[random.randint(0,len(stopwords_en)-1)]

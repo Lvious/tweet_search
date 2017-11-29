@@ -2,12 +2,8 @@ import re
 import json
 from datetime import datetime,timedelta
 
-import pymongo
-client = pymongo.MongoClient('52.91.51.100:27017')
-db = client.tweet
-
-import redis
-r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
+from Config import get_config
+_,db,r = get_config(
 
 def get_location(Location):
     Location = re.sub('[^a-zA-Z ,]','',Location)

@@ -23,24 +23,24 @@ def fetch_activities(tweet_id):
 	for re_user in re_users('div.account'):
 		userPQ = PyQuery(re_user)
 		userd = {
-						'screen_name':userPQ.attr('data-screen-name')
-						'user_id':userPQ.attr('data-user-id')
-						'data_name':userPQ.attr('data-name')
-						'avatar_src':userPQ('img.avatar').attr('src')
-						'userbadges':userPQ('span.UserBadges').text()
-						'bio':userPQ('p.bio').text()
+						'screen_name':userPQ.attr('data-screen-name'),
+						'user_id':userPQ.attr('data-user-id'),
+						'data_name':userPQ.attr('data-name'),
+						'avatar_src':userPQ('img.avatar').attr('src'),
+						'userbadges':userPQ('span.UserBadges').text(),
+						'bio':userPQ('p.bio').text(),
 		}
 		retusers.append({userd['screen_name']:userd})
 	favor_users = PyQuery(requests.get(favor_url,headers=headers).json()['htmlUsers'])('ol.activity-popup-users')
 	for favor_user in favor_users('div.account'):
 		userPQ = PyQuery(favor_user)
 		userd = {
-						'screen_name':userPQ.attr('data-screen-name')
-						'user_id':userPQ.attr('data-user-id')
-						'data_name':userPQ.attr('data-name')
-						'avatar_src':userPQ('img.avatar').attr('src')
-						'userbadges':userPQ('span.UserBadges').text()
-						'bio':userPQ('p.bio').text()
+						'screen_name':userPQ.attr('data-screen-name'),
+						'user_id':userPQ.attr('data-user-id'),
+						'data_name':userPQ.attr('data-name'),
+						'avatar_src':userPQ('img.avatar').attr('src'),
+						'userbadges':userPQ('span.UserBadges').text(),
+						'bio':userPQ('p.bio').text(),
 		}
 		favorusers.append({userd['screen_name']:userd})
 		
@@ -115,21 +115,21 @@ def getTweet(tweetHTML):
 	
 	#user
 	tweet.user = {
-				'screen_name':screen_name
-				'user_id':user_id
-				'data_name':data_name
-				'avatar_src':avatar_src
-				'userbadges':userbadges
+				'screen_name':screen_name,
+				'user_id':user_id,
+				'data_name':data_name,
+				'avatar_src':avatar_src,
+				'userbadges':userbadges,
 	}
 	
 	#media
 	tweet.media = {
-					'quote_id':quote_id
-					'has_cards':has_cards
-					'card_url':card_url
-					'img_src':img_src
-					'video_src':video_src
-					'geo':geo
+					'quote_id':quote_id,
+					'has_cards':has_cards,
+					'card_url':card_url,
+					'img_src':img_src,
+					'video_src':video_src,
+					'geo':geo,
 	}
 	
 	#text
@@ -143,14 +143,14 @@ def getTweet(tweetHTML):
 	
 	#action
 	tweet.action = {
-								'retusers':retusers
-								'favorusers':favorusers
-								'replies':replies
-								'retweets':retweets
-								'favorites':favorites
-								'retweet_id':retweet_id
-								'retweeter':retweeter
-								'is_retweet':True if tweet.retweet_id != None else False
+								'retusers':retusers,
+								'favorusers':favorusers,
+								'replies':replies,
+								'retweets':retweets,
+								'favorites':favorites,
+								'retweet_id':retweet_id,
+								'retweeter':retweeter,
+								'is_retweet':True if tweet.retweet_id != None else False,
 	}
 	
 	return tweet

@@ -21,10 +21,28 @@ def fetch_activities(tweet_id):
 		}
 	re_users = PyQuery(requests.get(re_url,headers=headers).json()['htmlUsers'])('ol.activity-popup-users')
 	for re_user in re_users('div.account'):
-		retusers.append(PyQuery(re_user).attr('data-screen-name'))
+		userPQ = PyQuery(re_user)
+		userd = {
+						'screen_name':userPQ.attr('data-screen-name')
+						'user_id':userPQ.attr('data-user-id')
+						'data_name':userPQ.attr('data-name')
+						'avatar_src':userPQ('img.avatar').attr('src')
+						'userbadges':userPQ('span.UserBadges').text()
+						'bio':userPQ('p.bio').text()
+		}
+		retusers.append({userd['screen_name']:userd})
 	favor_users = PyQuery(requests.get(favor_url,headers=headers).json()['htmlUsers'])('ol.activity-popup-users')
 	for favor_user in favor_users('div.account'):
-		favorusers.append(PyQuery(favor_user).attr('data-screen-name'))
+		userPQ = PyQuery(favor_user)
+		userd = {
+						'screen_name':userPQ.attr('data-screen-name')
+						'user_id':userPQ.attr('data-user-id')
+						'data_name':userPQ.attr('data-name')
+						'avatar_src':userPQ('img.avatar').attr('src')
+						'userbadges':userPQ('span.UserBadges').text()
+						'bio':userPQ('p.bio').text()
+		}
+		favorusers.append({userd['screen_name']:userd})
 		
 	return retusers,favorusers
 
@@ -50,16 +68,18 @@ def getTweet(tweetHTML):
 	retweet_id = tweetPQ.attr('data-retweet-id')
 	retweeter = tweetPQ.attr('data-retweeter')
 	conversation_id = tweetPQ.attr('data-conversation-id')
-	#permalink = tweetPQ.attr("data-permalink-path")
 	dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"))
+	#permalink = tweetPQ.attr("data-permalink-path")
 	
 	#user
-	user_screen_name = tweetPQ.attr('data-screen-name')
+	screen_name = tweetPQ.attr('data-screen-name')
 	user_id = tweetPQ.attr('data-user-id')
+	data_name = tweetPQ.attr('data-name')
+	avatar_src = tweetPQ('img.avatar').attr('src')
+	userbadges = tweetPQ('span.UserBadges').text()
 	
 	#text
 	hashtags,urls = fetch_entities(tweetPQ)
-	retusers,favorusers = fetch_activities(id)
 	mentions = tweetPQ.attr("data-mentions")
 	lang = tweetPQ("p.js-tweet-text").attr('lang')
 	raw_text = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'))
@@ -74,17 +94,16 @@ def getTweet(tweetHTML):
 	card_url = tweetPQ('div.js-macaw-cards-iframe-container').attr('data-card-url')
 	img_src = tweetPQ('div.AdaptiveMedia-container img').attr('src')
 	video_src = tweetPQ('div.AdaptiveMedia-container video').attr('src')
-	
-	#count
-	replies = int(tweetPQ("span.ProfileTweet-action--reply span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-	favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
-
-	#geo
 	geo = ''
 	geoSpan = tweetPQ('span.Tweet-geo')
 	if len(geoSpan) > 0:
 		geo = geoSpan.attr('title')
+	
+	#action
+	retusers,favorusers = fetch_activities(id)
+	replies = int(tweetPQ("span.ProfileTweet-action--reply span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
+	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
+	favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
 	
 	## tweet model
 	
@@ -94,33 +113,46 @@ def getTweet(tweetHTML):
 	tweet.is_retweet = True if tweet.retweet_id != None else False
 	tweet.conversation_id = conversation_id
 	tweet.is_reply = tweet.id != tweet.conversation_id
-	#tweet.permalink = 'https://twitter.com' + permalink
 	tweet.created_at = datetime.datetime.fromtimestamp(dateSec)
+	#tweet.permalink = 'https://twitter.com' + permalink
 	
-	tweet.username = user_screen_name
-	tweet.uid = user_id
+	#user
+	tweet.user = {
+				'screen_name':screen_name
+				'user_id':user_id
+				'data_name':data_name
+				'avatar_src':avatar_src
+				'userbadges':userbadges
+	}
 	
-	tweet.quote_id = quote_id
-	tweet.has_cards = has_cards
-	tweet.card_url = card_url
-	tweet.img_src = img_src
-	tweet.video_src = video_src
+	#media
+	tweet.media = {
+					'quote_id':quote_id
+					'has_cards':has_cards
+					'card_url':card_url
+					'img_src':img_src
+					'video_src':video_src
+					'geo':geo
+	}
 	
+	#text
 	tweet.hashtags = hashtags
 	tweet.urls = urls
-	tweet.retusers = retusers
-	tweet.favorusers = favorusers
 	tweet.mentions = mentions.split(' ') if mentions != None else None
 	tweet.lang = lang
 	tweet.raw_text = raw_text
 	tweet.standard_text = standard_text
 	#tweet.clean_text = clean_text
 	
-	tweet.replies = replies
-	tweet.retweets = retweets
-	tweet.favorites = favorites
-
-	tweet.geo = geo
+	#action
+	tweet.action = {
+								'retusers':retusers
+								'favorusers':favorusers
+								'replies':replies
+								'retweets':retweets
+								'favorites':favorites
+	}
+	
 	return tweet
 
 class TweetManager:

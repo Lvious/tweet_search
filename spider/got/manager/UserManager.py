@@ -4,45 +4,15 @@ from pyquery import PyQuery
 import random
 random.seed(1)
 
-def getTweet(tweetHTML):
-	tweetPQ = PyQuery(tweetHTML)
-	tweet = models.Tweet()
-	
-	usernameTweet = tweetPQ("span:first.username.u-dir b").text();
-	txt = re.sub(r"\s+", " ", tweetPQ("p.js-tweet-text").text().replace('# ', '#').replace('@ ', '@'));
-	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-	favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""));
-	dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"));
-	id = tweetPQ.attr("data-tweet-id");
-	permalink = tweetPQ.attr("data-permalink-path");
-	
-	geo = ''
-	geoSpan = tweetPQ('span.Tweet-geo')
-	if len(geoSpan) > 0:
-		geo = geoSpan.attr('title')
-	
-	tweet.id = id
-	tweet.permalink = 'https://twitter.com' + permalink
-	tweet.username = usernameTweet
-	tweet.text = txt
-	#tweet.clean_text =   TO DO
-	tweet.date = datetime.datetime.fromtimestamp(dateSec)
-	#tweet.reply = reply   TO DO
-	tweet.retweets = retweets
-	tweet.favorites = favorites
-	tweet.mentions = " ".join(re.compile('(@\\w*)').findall(tweet.text))
-	tweet.hashtags = " ".join(re.compile('(#\\w*)').findall(tweet.text))
-	#tweet.href =          TO DO
-	tweet.geo = geo
-	return tweet
-
-class TweetManager:
-	
+class UserManager:
+	'''
+	from:xxx + to:xxx = @xxx
+	'''
 	def __init__(self):
 		pass
 		
 	@staticmethod
-	def getTweetsById(tweet_id):
+	def get_base_info(tweet_id):
 		url = 'https://twitter.com/xxx/status/%s'%(tweet_id)
 		tweets = PyQuery(url)('div.js-original-tweet')
 		for tweetHTML in tweets:
@@ -97,66 +67,3 @@ class TweetManager:
 			receiveBuffer(resultsAux)
 		
 		return results
-	
-	@staticmethod
-	def getJsonReponse(tweetCriteria, refreshCursor, cookieJar, proxy):
-		url = "https://twitter.com/i/search/timeline?q=%s&src=typd&max_position=%s"
-		
-		urlGetData = ''
-		
-		if hasattr(tweetCriteria, 'username'):
-			urlGetData += ' from:' + tweetCriteria.username
-		
-		if hasattr(tweetCriteria, 'querySearch'):
-			urlGetData += ' ' + tweetCriteria.querySearch
-		
-		if hasattr(tweetCriteria, 'near'):
-			urlGetData += "&near:" + tweetCriteria.near + " within:" + tweetCriteria.within
-		
-		if hasattr(tweetCriteria, 'since'):
-			urlGetData += ' since:' + tweetCriteria.since
-			
-		if hasattr(tweetCriteria, 'until'):
-			urlGetData += ' until:' + tweetCriteria.until
-		
-
-		if hasattr(tweetCriteria, 'topTweets'):
-			if tweetCriteria.topTweets:
-				url = "https://twitter.com/i/search/timeline?q=%s&src=typd&max_position=%s"
-		
-		if hasattr(tweetCriteria, 'tweetType'):
-			url = url + tweetCriteria.tweetType
-		
-		url = url % (urllib.quote(urlGetData), refreshCursor)
-		ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.%s'%(random.randint(0,999))
-
-		headers = [
-			('Host', "twitter.com"),
-			('User-Agent', ua), 
-			# Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36 
-			#Mozilla/5.0 (Windows NT 6.1; Win64; x64)
-			('Accept', "application/json, text/javascript, */*; q=0.01"),
-			('Accept-Language', "de,en-US;q=0.7,en;q=0.3"),
-			('X-Requested-With', "XMLHttpRequest"),
-			('Referer', url),
-			('Connection', "keep-alive")
-		]
-
-		if proxy:
-			opener = urllib2.build_opener(urllib2.ProxyHandler({'http': proxy, 'https': proxy}), urllib2.HTTPCookieProcessor(cookieJar))
-		else:
-			opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
-		opener.addheaders = headers
-
-		try:
-			response = opener.open(url)
-			jsonResponse = response.read()
-		except Exception,e:
-			print "Twitter weird response. Try to see on browser: https://twitter.com/search?q=%s&src=typd" % urllib.quote(urlGetData)
-			raise Exception(e.message)
-			#sys.exit()
-			#return None
-		
-		dataJson = json.loads(jsonResponse)
-		
-		return dataJson		

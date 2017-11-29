@@ -23,8 +23,7 @@ def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuff
 		if not json.has_key('min_position'):
 			break
 		refreshCursor = json['min_position']
-		if refreshCursor == None:
-			break
+
 		items = PyQuery(json['items_html'])('ol.stream-items')
 		
 		if len(items) == 0:
@@ -33,7 +32,7 @@ def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuff
 		for item in items:
 			tweets = []
 			for tweet in PyQuery(item)('div.js-stream-tweet'):
-				tweets.append(getTweet(tweet.__dict__))
+				tweets.append(getTweet(tweet).__dict__)
 				
 			results['conversation'].append(tweets)
 			#resultsAux.append(tweets)
@@ -41,6 +40,9 @@ def getDialog(original,screen_name,conversation_id,refreshCursor='', receiveBuff
 			if receiveBuffer and len(resultsAux) >= bufferLength:
 				receiveBuffer(resultsAux)
 				resultsAux = []
+				
+		if refreshCursor == None:
+			break
 			
 	if receiveBuffer and len(resultsAux) > 0:
 		receiveBuffer(resultsAux)
@@ -55,13 +57,13 @@ class DialogManager:
 	@staticmethod
 	def getDialogById(tweet_id):
 		tweet = TweetManager.getTweetsById(tweet_id)
-		if not tweet.is_reply or tweet.replies > 0:
-			return getDialog(tweet,tweet.username,tweet.conversation_id)
+		if not tweet.is_reply and tweet.action['replies'] > 0:
+			return getDialog(tweet,tweet.user['username'],tweet.conversation_id)
 		elif tweet.is_reply:
 			tweet = TweetManager.getTweetsById(tweet.conversation_id)
-			return getDialog(tweet,tweet.username,tweet.conversation_id)
+			return getDialog(tweet,tweet.user['username'],tweet.conversation_id)
 		else:
-			return tweet
+			return tweet.__dict__
 			
 	@staticmethod
 	def getDialogs(tweetCriteria, refreshCursor='', receiveBuffer=None, bufferLength=100, proxy=None):

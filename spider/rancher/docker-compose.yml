@@ -1,0 +1,13 @@
+version: '2'
+services:
+  master:
+    image: lixiepeng/tweet_search
+    command: python master.py
+    labels:
+      io.rancher.scheduler.affinity: spider.master:true
+
+  worker:
+    image: lixiepeng/tweet_search
+    command: python worker.py
+    labels:
+      io.rancher.scheduler.affinity: spider:true

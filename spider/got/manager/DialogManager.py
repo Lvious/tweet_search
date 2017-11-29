@@ -58,10 +58,10 @@ class DialogManager:
 	def getDialogById(tweet_id):
 		tweet = TweetManager.getTweetsById(tweet_id)
 		if not tweet.is_reply and tweet.action['replies'] > 0:
-			return getDialog(tweet,tweet.user['username'],tweet.conversation_id)
+			return getDialog(tweet,tweet.user['screen_name'],tweet.conversation_id)
 		elif tweet.is_reply:
 			tweet = TweetManager.getTweetsById(tweet.conversation_id)
-			return getDialog(tweet,tweet.user['username'],tweet.conversation_id)
+			return getDialog(tweet,tweet.user['screen_name'],tweet.conversation_id)
 		else:
 			return tweet.__dict__
 			

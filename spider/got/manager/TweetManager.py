@@ -150,7 +150,7 @@ def getTweet(tweetHTML):
 								'favorites':favorites,
 								'retweet_id':retweet_id,
 								'retweeter':retweeter,
-								'is_retweet':True if tweet.retweet_id != None else False,
+								'is_retweet':True if retweet_id != None else False,
 	}
 	
 	return tweet

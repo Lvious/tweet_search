@@ -100,7 +100,7 @@ def getTweet(tweetHTML):
 	#action
 	retweet_id = tweetPQ.attr('data-retweet-id')
 	retweeter = tweetPQ.attr('data-retweeter')
-	retusers,favorusers = fetch_activities(id)
+	#retusers,favorusers = fetch_activities(id)
 	replies = int(tweetPQ("span.ProfileTweet-action--reply span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
 	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
 	favorites = int(tweetPQ("span.ProfileTweet-action--favorite span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
@@ -143,8 +143,8 @@ def getTweet(tweetHTML):
 	
 	#action
 	tweet.action = {
-								'retusers':retusers,
-								'favorusers':favorusers,
+								#'retusers':retusers,
+								#'favorusers':favorusers,
 								'replies':replies,
 								'retweets':retweets,
 								'favorites':favorites,

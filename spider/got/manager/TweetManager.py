@@ -65,8 +65,6 @@ def getTweet(tweetHTML):
 	
 	#base info
 	id = tweetPQ.attr("data-tweet-id")
-	retweet_id = tweetPQ.attr('data-retweet-id')
-	retweeter = tweetPQ.attr('data-retweeter')
 	conversation_id = tweetPQ.attr('data-conversation-id')
 	dateSec = int(tweetPQ("small.time span.js-short-timestamp").attr("data-time"))
 	#permalink = tweetPQ.attr("data-permalink-path")
@@ -100,6 +98,8 @@ def getTweet(tweetHTML):
 		geo = geoSpan.attr('title')
 	
 	#action
+	retweet_id = tweetPQ.attr('data-retweet-id')
+	retweeter = tweetPQ.attr('data-retweeter')
 	retusers,favorusers = fetch_activities(id)
 	replies = int(tweetPQ("span.ProfileTweet-action--reply span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
 	retweets = int(tweetPQ("span.ProfileTweet-action--retweet span.ProfileTweet-actionCount").attr("data-tweet-stat-count").replace(",", ""))
@@ -108,9 +108,6 @@ def getTweet(tweetHTML):
 	## tweet model
 	
 	tweet.id = id
-	tweet.retweet_id = retweet_id
-	tweet.retweeter = retweeter
-	tweet.is_retweet = True if tweet.retweet_id != None else False
 	tweet.conversation_id = conversation_id
 	tweet.is_reply = tweet.id != tweet.conversation_id
 	tweet.created_at = datetime.datetime.fromtimestamp(dateSec)
@@ -151,6 +148,9 @@ def getTweet(tweetHTML):
 								'replies':replies
 								'retweets':retweets
 								'favorites':favorites
+								'retweet_id':retweet_id
+								'retweeter':retweeter
+								'is_retweet':True if tweet.retweet_id != None else False
 	}
 	
 	return tweet

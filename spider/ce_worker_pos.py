@@ -15,7 +15,7 @@ def advance_search_dataset(q,f,num,event_id):
     tweets = got.manager.TweetManager.getTweets(tweetCriteria)
     for tweet in tweets:
         if collection.find_one({'_id':tweet['id']}) == None:
-            collection.insert_one({'_id':tweet['id'],'tweet':tweet,'event_id':json.dumps(event_id,default=json_util.default),'f':f,'q':q})
+            collection.insert_one({'_id':tweet['id'],'tweet':tweet,'event_id':json.loads(event_id,default=json_util.object_hook),'f':f,'q':q})
 
 def run_pos_task(message_data):
     try:

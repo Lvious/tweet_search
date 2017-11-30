@@ -12,7 +12,7 @@ _,db,r = get_config()
 def get_task():
 	for item in tqdm(db.current_event.find({'type':{'$gte':1}},{'_id':1,'query_str':1})):
 		q = item['query_str']
-		message = {'q':q,'f':['&f=news','','&f=tweets'],'num':1000,'event_id':json.dumps(item['_id'],object_hook=json_util.default)}
+		message = {'q':q,'f':['&f=news','','&f=tweets'],'num':1000,'event_id':json.dumps(item['_id'],default=json_util.default)}
 		print message
 		r.rpush('task:pos',json.dumps(message))
 

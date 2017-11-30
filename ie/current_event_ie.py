@@ -52,7 +52,7 @@ def best_openie(openies):
 	object_lsit = openie_df['object'].tolist()
 	object_,lenth  = object_lsit[0],len(object_lsit[0])
 	for i in object_lsit[1:]:
-		if len(i) <= lenth:          # get the shortest object
+		if len(i) >= lenth:          # get the longest object
 			object_,lenth = i,len(i)
 	return {'subject':get_most_common(openie_df.subject),
 			'relation':get_most_common(openie_df.relation),

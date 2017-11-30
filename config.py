@@ -1,13 +1,6 @@
-import sys
-if sys.version_info[0] < 3:
-	import got
-else:
-	import got3 as got
-
 import pymongo
 
 import redis
-
 
 def get_config():
 	#mongo
@@ -18,4 +11,4 @@ def get_config():
 	#redis
 	r = redis.StrictRedis(host='10.42.214.43', port=6379, db=0, password='lixiepeng')
 	
-	return got,db,r
+	return db,r

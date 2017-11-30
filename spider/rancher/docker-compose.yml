@@ -2,12 +2,12 @@ version: '2'
 services:
   master:
     image: lixiepeng/lxp:tweet
-    command: git pull && python master.py
+    command: /bin/bash ./run.sh && python master.py
     labels:
       io.rancher.scheduler.affinity: spider.master:true
 
   worker:
     image: lixiepeng/lxp:tweet
-    command: git pull && python worker.py
+    command: /bin/bash ./run.sh && python worker.py
     labels:
       io.rancher.scheduler.affinity: spider:true

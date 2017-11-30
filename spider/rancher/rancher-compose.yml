@@ -1,6 +1,6 @@
 version: '2'
 services:
-  master:
-    scale: 1
+  # master:
+    # scale: 1
   worker:
     scale: 3

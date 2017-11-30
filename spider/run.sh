@@ -1,4 +1,4 @@
 #!/bin/bash
-cmd = "python $SCRIPT"
+set -m
 git pull
-$cmd
+python $SCRIPT

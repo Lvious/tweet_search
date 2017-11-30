@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 from tqdm import tqdm
 
 from Config import get_config
-_,db,r = get_config(
+_,db,r = get_config()
 
 
 def get_task():

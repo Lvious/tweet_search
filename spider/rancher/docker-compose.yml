@@ -5,6 +5,7 @@ services:
     command: /bin/bash ./run.sh
     environment:
       SCRIPT: master.py
+    restart:no
     labels:
       io.rancher.scheduler.affinity: spider.master:true
       io.rancher.container.pull_image: always

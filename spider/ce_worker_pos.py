@@ -30,8 +30,8 @@ def run_pos_task(message_data):
             pool.close()
             pool.join()
         return True
-    except:
-        return False
+    except Exception,e:
+        return e.message
   
 if __name__ == '__main__':
     print 'craw_worker start!'
@@ -40,9 +40,9 @@ if __name__ == '__main__':
         if queue:
             print 'craw_worker process!'
             craw = run_pos_task(json.loads(queue))
-            if craw:
+            if type(craw) != str:
                 db.pos_log.insert_one({'message':json.loads(queue),'status':1})
             else:
-                db.pos_log.insert_one({'message':json.loads(queue),'status':0})
+                db.pos_log.insert_one({'message':json.loads(queue),'status':0,'error':craw})
         time.sleep(1)
         print 'craw_worker wait!'

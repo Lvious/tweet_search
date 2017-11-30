@@ -15,5 +15,5 @@ services:
     environment:
       SCRIPT: worker.py
     labels:
-      io.rancher.scheduler.affinity: spider:true
+      io.rancher.scheduler.affinity:host_label spider=true
       io.rancher.container.pull_image: always

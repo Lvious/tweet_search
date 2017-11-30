@@ -6,14 +6,23 @@ services:
     # environment:
       # SCRIPT: master.py
     # labels:
-      # io.rancher.scheduler.affinity: spider.master:true
+      # io.rancher.scheduler.affinity:host_label spider.master:true
       # io.rancher.container.pull_image: always
 
-  worker:
+  worker1:
     image: lixiepeng/lxp:tweet
     command: /bin/bash ./run.sh
     environment:
       SCRIPT: worker.py
     labels:
       io.rancher.scheduler.affinity:host_label spider=true
+      io.rancher.container.pull_image: always
+  
+  worker2:
+    image: lixiepeng/lxp:tweet
+    command: /bin/bash ./run.sh
+    environment:
+      SCRIPT: worker.py
+    labels:
+      io.rancher.scheduler.affinity:host_label spider.master=true
       io.rancher.container.pull_image: always

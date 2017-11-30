@@ -2,5 +2,9 @@ version: '2'
 services:
   # master:
     # scale: 1
-  worker:
+  worker1:
+    scale: 3 
+    #80
+  worker2:
     scale: 3
+    #100

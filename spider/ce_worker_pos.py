@@ -16,6 +16,7 @@ def advance_search_dataset(q,f,num,event_id):
     for tweet in tweets:
         if collection.find_one({'_id':tweet['id']}) == None:
             collection.insert_one({'_id':tweet['id'],'tweet':tweet,'event_id':json.loads(event_id,object_hook=json_util.object_hook),'f':f,'q':q})
+    db.close()
 
 def run_pos_task(message_data):
     try:
@@ -46,3 +47,4 @@ if __name__ == '__main__':
                 db.pos_log.insert_one({'message':json.loads(queue),'status':0,'error':craw})
         time.sleep(1)
         print 'craw_worker wait!'
+    db.close()

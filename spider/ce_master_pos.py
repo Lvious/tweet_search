@@ -15,6 +15,7 @@ def get_task():
 		message = {'q':q,'f':['&f=news','','&f=tweets'],'num':100,'event_id':json.dumps(item['_id'],default=json_util.default)}
 		print message
 		r.rpush('task:pos',json.dumps(message))
+	db.close()
 
 if __name__ == '__main__':
 	get_task()

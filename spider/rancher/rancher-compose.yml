@@ -4,7 +4,7 @@ services:
     # scale: 1
   worker1:
     scale: 3 
-    #48
+    #36
   worker2:
     scale: 3
-    #32
+    #24

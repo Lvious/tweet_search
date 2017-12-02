@@ -14,6 +14,8 @@ services:
     command: /bin/bash ./run.sh
     environment:
       SCRIPT: worker.py
+      MONGOHOST: localhost
+      REDISHOST: localhost
     labels:
       io.rancher.scheduler.affinity:host_label: spider=worker
       io.rancher.container.pull_image: always
@@ -23,6 +25,8 @@ services:
     command: /bin/bash ./run.sh
     environment:
       SCRIPT: worker.py
+      MONGOHOST: localhost
+      REDISHOST: localhost
     labels:
       io.rancher.scheduler.affinity:host_label: spider=master
       io.rancher.container.pull_image: always

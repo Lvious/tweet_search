@@ -24,7 +24,8 @@ def tweet_cluster(X,max_cluster_num=8):
 		X_train_tfidf = tfidf.fit_transform(X_train_count)
 		km,score = kmeans_best(X,X_train_tfidf,max_cluster_num)
 		#print 'clusters:',km.get_params()['n_clusters']
-		lda = LatentDirichletAllocation(n_topics=km.get_params()['n_clusters'], max_iter=5,
+		lda = LatentDirichletAllocation(n_topics=km.get_params()['n_clusters'],
+									max_iter=5,
 									learning_method='online',
 									learning_offset=50.,
 									random_state=0)

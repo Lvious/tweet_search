@@ -3,7 +3,7 @@ coreNLP konradstrack/corenlp 9000:9000
 spacyapi jgontrum/spacyapi:en 8080:80
 bigdl intelanalytics/bigdl:0.1.1-spark2.1.0-u14.04-v2 8888:8888
 jupyter/all-spark-notebook:latest   
-redis bitnami/redis:latest 6379:6379  -e ALLOW_EMPTY_PASSWORD=yes  [https://hub.docker.com/r/bitnami/redis/]
+redis bitnami/redis:latest 6379:6379  -e REDIS_PASSWORD  ALLOW_EMPTY_PASSWORD=yes  [https://hub.docker.com/r/bitnami/redis/]
 mongo tutum/mongodb 27017:27017 28017:28017  -e AUTH=no  MONGODB_DATABASE     MONGODB_PASS      [https://hub.docker.com/r/tutum/mongodb/]
 gitlab/gitlab-ce:latest                                             [https://hub.docker.com/r/gitlab/gitlab-ce/]
 lixiepeng/lxp:pypiserver

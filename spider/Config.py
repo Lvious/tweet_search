@@ -1,16 +1,19 @@
+import os
 import sys
-if sys.version_info[0] < 3:
-	import got
-else:
-	import got3 as got
 
 import pymongo
 
 import redis
 
-import os
 
-def get_config():
+
+def get_spider_config():
+	#got
+	if sys.version_info[0] < 3:
+		import got
+	else:
+		import got3 as got
+		
 	#mongo
 	client = pymongo.MongoClient(os.environ['MONGOHOST'],27017)
 	db = client.tweet

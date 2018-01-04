@@ -49,9 +49,9 @@ if __name__ == '__main__':
 				db.korea_log.insert_one({'message':json.loads(queue),'status':0,'error':e.message})
 			if r.llen('task:korea'):
 				message = {"is_last":True}
-				l.push('task:classify',json.dumps(message))
+				l.rpush('task:classify',json.dumps(message))
 			else:
 				message = {"is_last":False}
-				l.push('task:classify',json.dumps(message))				
+				l.rpush('task:classify',json.dumps(message))				
 		time.sleep(1)
 		print 'craw_worker wait!'

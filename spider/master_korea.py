@@ -26,7 +26,7 @@ def get_task():
             for trigger in triggers:
                 q = get_query_str(locs,triggers,now,timedelta(minutes=15))
                 message = {'q':q,'f':['&f=news','','&f=tweets'],'num':1000}
-                r.push("task:korea",json.dumps(message))
+                r.rpush("task:korea",json.dumps(message))
         time.sleep(15*60)
 if __name__ == '__main__':
 	get_task()

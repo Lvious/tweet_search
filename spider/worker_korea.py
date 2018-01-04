@@ -9,14 +9,15 @@ import json
     
 import multiprocessing
 from multiprocessing import Pool
+from datetime import datetime
 
 from Config import get_spider_config
 _,db,r = get_spider_config()
 
-def advance_search_korea(q,f,num):
+def advance_search_korea(q,f,num,s,u):
 
 	collection = db.korea
-	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setMaxTweets(num)
+	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setSinceTimeStamp(s).setUntilTimeStamp(u).setMaxTweets(num)
 	tweets = got.manager.TweetManager.getTweets(tweetCriteria)
 	for tweet in tweets:
 		if collection.find_one({'_id':tweet.id}) == None:
@@ -26,11 +27,13 @@ def run_korea_task(message_data):
 	try:
 		q = message_data['q']
 		num = message_data['num']
+		sinceTimeStamp = datetime.strptime(message_data['sinceTimeStamp'],"%Y-%m-%d %H:%M:%S")
+		untilTimeStamp = datetime.strptime(message_data['untilTimeStamp'],"%Y-%m-%d %H:%M:%S")
 		if type(message_data['f']) != list:
-			advance_search_korea(q,message_data['f'],num)
+			advance_search_korea(q,message_data['f'],num,sinceTimeStamp,untilTimeStamp)
 		else:
 			pool = Pool(processes=multiprocessing.cpu_count())
-			[pool.apply(advance_search_korea,(q,f,num)) for f in message_data['f']]
+			[pool.apply(advance_search_korea,(q,f,num,sinceTimeStamp,untilTimeStamp)) for f in message_data['f']]
 			pool.close()
 			pool.join()
 	except Exception,e:

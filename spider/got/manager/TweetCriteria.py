@@ -31,6 +31,10 @@ class TweetCriteria:
 	def setSinceTimeStamp(self, sinceTimeStamp):
 		self.sinceTimeStamp = sinceTimeStamp
 		return self
+
+	def setUntilTimeStamp(self, untilTimeStamp):
+		self.untilTimeStamp = untilTimeStamp
+		return self
 		
 	def setTopTweets(self, topTweets):
 		self.topTweets = topTweets

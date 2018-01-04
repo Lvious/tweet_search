@@ -11,17 +11,21 @@ import multiprocessing
 from multiprocessing import Pool
 
 import pymongo
-#client = pymongo.MongoClient('101.132.114.125:27017')
-client = pymongo.MongoClient('34.224.37.110:27017')
-db = client.tweet
 
-import redis
-r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
+from Config import get_config
+_,db,r = get_config()
+
+# #client = pymongo.MongoClient('101.132.114.125:27017')
+# client = pymongo.MongoClient('34.224.37.110:27017')
+# db = client.tweet
+
+# import redis
+# r = redis.StrictRedis(host='52.91.102.254', port=6379, db=0)
 
 def advance_search_test(q,f,num):
 	#client = pymongo.MongoClient('101.132.114.125:27017')
-	client = pymongo.MongoClient('34.224.37.110:27017')
-	db = client.tweet
+	# client = pymongo.MongoClient('34.224.37.110:27017')
+	# db = client.tweet
 	collection = db.test
 	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setMaxTweets(num)
 	tweets = got.manager.TweetManager.getTweets(tweetCriteria)

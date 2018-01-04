@@ -3,7 +3,7 @@ import json
 from datetime import datetime,timedelta
 
 from Config import get_config
-_,db,r = get_config(
+_,db,r = get_config()
 
 def get_location(Location):
     Location = re.sub('[^a-zA-Z ,]','',Location)

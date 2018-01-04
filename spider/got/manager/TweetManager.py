@@ -209,7 +209,11 @@ class TweetManager:
 						active = False
 						break
 				
-				results.append(tweet.__dict__)
+				if hasattr(tweetCriteria, 'untilTimeStamp'):
+					if tweet.created_at <= tweetCriteria.untilTimeStamp:
+						results.append(tweet.__dict__)
+				else:
+					results.append(tweet.__dict__)
 				#resultsAux.append(tweet)
 				
 				if receiveBuffer and len(resultsAux) >= bufferLength:

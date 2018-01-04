@@ -19,7 +19,7 @@ def get_task():
     locs=["North Korea"]
     triggers=["test","launch","fired","messile"]
     while True:
-        now = datetime.datetime.now()
+        now = datetime.now()
         for loc in locs:
             for trigger in triggers:
                 q = get_query_str(locs,triggers,now,timedelta(minutes=15))

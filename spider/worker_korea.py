@@ -46,6 +46,7 @@ if __name__ == '__main__':
 		if queue:
 			print 'craw_worker process!'
 			try:
+				if json.loads(queue).has_
 				run_korea_task(json.loads(queue))
 				db.korea_log.insert_one({'message':json.loads(queue),'status':1})
 			except Exception,e:
@@ -55,6 +56,7 @@ if __name__ == '__main__':
 				r.rpush('task:classify',json.dumps(message))
 			else:
 				message = {"is_last":False}
-				r.rpush('task:classify',json.dumps(message))				
+				r.rpush('task:classify',json.dumps(message))	
+
 		time.sleep(1)
 		print 'craw_worker wait!'

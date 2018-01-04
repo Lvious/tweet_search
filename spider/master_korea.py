@@ -7,20 +7,7 @@ from datetime import datetime,timedelta
 from Config import get_spider_config
 _,db,r = get_spider_config()
 
-location_group_by_char_5 = db.event_metadata.find_one({'name':'location_group_by_char_5'})['data']
-type_group_by_char_5 = db.event_metadata.find_one({'name':'type_group_by_char_5'})['data']
-freq_users = [i['tweet']['user']['standard_text'] for i in db.dataset_korea_m_1.find({},{"tweet.user.screen_name":1})]
 
-for loc in location_group_by_char_5:
-	for i,v in enumerate(loc):
-		if ' ' in v:
-			loc[i] = '"'+v+'"'
-			
-for type_ in type_group_by_char_5:
-	for i,v in enumerate(type_):
-		if ' ' in v:
-			type_[i] = '"'+v+'"'
-			
 
             
 def get_query_str(loc,trigger,now,time_delta):

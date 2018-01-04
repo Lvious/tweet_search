@@ -20,8 +20,8 @@ def get_task():
     locs=["North Korea"]
     triggers=["test","launch","fire"]
     target = ["messile","satellite","rocket","nuclear"]
+    now = datetime.now()
     while True:
-        now = datetime.now()
         for loc in locs:
             for target in targets:
                 q = get_query_str(loc,triggers,target)
@@ -35,7 +35,12 @@ def get_task():
                 "sinceTimeStamp":(now - timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"),
                 "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
             }
-            r.rpush('task:korea',json.dumps(message))            
-        time.sleep(60*60)
+            r.rpush('task:korea',json.dumps(message))
+        time_gone = (datetime.now()-now).seconds
+        if time_gone < 60*60:
+            time.sleep(60*60-time_gone)
+            now = datetime.now()
+        else:
+            now = now+timedelta(minutes=60)
 if __name__ == '__main__':
 	get_task()

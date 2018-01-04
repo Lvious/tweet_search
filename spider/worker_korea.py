@@ -20,8 +20,8 @@ def advance_search_korea(q,f,num,s,u):
 	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setSinceTimeStamp(s).setUntilTimeStamp(u).setMaxTweets(num)
 	tweets = got.manager.TweetManager.getTweets(tweetCriteria)
 	for tweet in tweets:
-		if collection.find_one({'_id':tweet.id}) == None:
-			collection.insert_one({'_id':tweet.id,'tweet':tweet,'f':f,'q':q})
+		if collection.find_one({'_id':tweet['id']}) == None:
+			collection.insert_one({'_id':tweet['id'],'tweet':tweet,'f':f,'q':q})
 
 def run_korea_task(message_data):
 	try:

@@ -4,7 +4,7 @@ import fire
 from tqdm import tqdm
 from datetime import datetime,timedelta
 
-from Config import get_config
+from Config import get_spider_config
 _,db,r = get_spider_config()
 
 location_group_by_char_5 = db.event_metadata.find_one({'name':'location_group_by_char_5'})['data']

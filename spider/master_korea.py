@@ -13,7 +13,8 @@ _,db,r = get_spider_config()
             
 def get_query_str(loc,trigger,now,time_delta):
 	start = (now - time_delta).strftime("%Y-%m-%d %H:%M:%S")
-	return '('+' OR '.join(loc)+')' + ' '+'('+' OR '.join(trigger)+')' + ' '+'since:'+start+' '+ 'until:'+now
+	now_str = now.strftime("%Y-%m-%d %H:%M:%S")
+	return '('+' OR '.join(loc)+')' + ' '+'('+' OR '.join(trigger)+')' + ' '+'since:'+start+' '+ 'until:'+now_str
 
 
 def get_task():

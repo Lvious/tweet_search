@@ -26,7 +26,7 @@ def get_task():
             for trigger in triggers:
                 q = get_query_str(locs,triggers)
                 message = {'q':q,'f':['&f=news','','&f=tweets'],'num':1000,
-                "sinceTimeStamp":(now - timedelta(minutes=15)).strftime("%Y-%m-%d %H:%M:%S"),
+                "sinceTimeStamp":(now - timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"),
                 "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
                 }
                 r.rpush("task:korea",json.dumps(message))

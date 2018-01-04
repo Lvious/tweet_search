@@ -10,7 +10,7 @@ import json
 import multiprocessing
 from multiprocessing import Pool
 
-from Config import get_config
+from Config import get_spider_config
 _,db,r = get_spider_config()
 
 def advance_search_korea(q,f,num):

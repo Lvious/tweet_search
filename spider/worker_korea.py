@@ -50,7 +50,7 @@ if __name__ == '__main__':
 				db.korea_log.insert_one({'message':json.loads(queue),'status':1})
 			except Exception,e:
 				db.korea_log.insert_one({'message':json.loads(queue),'status':0,'error':e.message})
-			if r.llen('task:korea'):
+			if r.llen('task:korea') == 0:
 				message = {"is_last":True}
 				r.rpush('task:classify',json.dumps(message))
 			else:

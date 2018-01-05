@@ -30,12 +30,14 @@ def get_task():
                 "sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME)).strftime("%Y-%m-%d %H:%M:%S"),
                 "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
                 }
+		print(message)
                 r.rpush("task:korea",json.dumps(message))
         for user in freq_users:
             message = {'q':'from:'+user,'f':'&f=tweets','num':-1,
                 "sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME)).strftime("%Y-%m-%d %H:%M:%S"),
                 "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
             }
+	    print(message)
             r.rpush('task:korea',json.dumps(message))
         time_gone = (datetime.now()-now).seconds
         if time_gone < 60*WAIT_TIME:

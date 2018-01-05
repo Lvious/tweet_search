@@ -14,7 +14,7 @@ freq_users = set([i['tweet']['user']['screen_name'] for i in db.dataset_korea_m_
 def get_query_str(loc,triggers,target):
 	# start = (now - time_delta).strftime("%Y-%m-%d %H:%M:%S")
 	# now_str = now.strftime("%Y-%m-%d %H:%M:%S")
-	return '('+loc+')' + + ' '+'('+' OR '.join(triggers)+')'+' '+'('+target+')'
+	return '('+loc+')' + ' '+'('+' OR '.join(triggers)+')'+' '+'('+target+')'
 
 def get_task():
     locs=["North Korea"]

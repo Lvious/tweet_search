@@ -53,9 +53,9 @@ if __name__ == '__main__':
 			if r.llen('task:korea') == 0:
 				message = {"is_last":True}
 				r.rpush('task:classify',json.dumps(message))
-			else:
-				message = {"is_last":False}
-				r.rpush('task:classify',json.dumps(message))	
+			#else:
+				#message = {"is_last":False}
+				#r.rpush('task:classify',json.dumps(message))	
 
 		time.sleep(1)
 		print 'craw_worker wait!'

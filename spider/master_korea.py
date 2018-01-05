@@ -19,7 +19,7 @@ def get_query_str(loc,triggers,target):
 def get_task():
     locs=["North Korea"]
     triggers=["test","launch","fire"]
-    target = ["messile","satellite","rocket","nuclear"]
+    targets = ["messile","satellite","rocket","nuclear"]
     now = datetime.now()
     WAIT_TIME = 15
     while True:

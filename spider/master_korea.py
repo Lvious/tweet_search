@@ -31,7 +31,7 @@ def get_task():
                 }
                 r.rpush("task:korea",json.dumps(message))
         for user in freq_users:
-            message = {'q':'from:'+user,'f':'&f=tweets','num':-1
+            message = {'q':'from:'+user,'f':'&f=tweets','num':-1,
                 "sinceTimeStamp":(now - timedelta(minutes=60)).strftime("%Y-%m-%d %H:%M:%S"),
                 "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
             }

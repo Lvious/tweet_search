@@ -14,10 +14,12 @@ from multiprocessing.dummy import Pool
 from pprint import pprint
 import pymongo
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
-client = pymongo.MongoClient('54.161.160.206:29017')
-db = client.tweet
+
+from Config import get_spider_config
+_,db,r = get_spider_config()
 
 
+re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
 def batch_ftpredict(texts):
 	if type(texts) != list:
 		texts = [texts]
@@ -55,6 +57,8 @@ def classify():
 	for i in query:
 		ids.append(i['_id'])
 		texts.append(i['tweet']['raw_text'])
+	if len(ids) == 0:
+		return None
 	probs = batch_ftpredict(texts)
 	requests = [UpdateOne({'_id': _id,'class':None}, {'$set': {'class':probs[index]}}) for index,_id in tqdm(enumerate(ids))]
 	result = db.korea.bulk_write(requests)
@@ -68,7 +72,9 @@ if __name__ == '__main__':
 			print 'classify_worker process!'
 			classify()
 			message = json.loads(queue)
+			print message
 			if message['is_last']:
 				r.rpush('task:clustering',json.dumps(message))
-		time.sleep(1)
 		print 'classify_worker wait!'
+		time.sleep(1)
+	

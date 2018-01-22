@@ -15,13 +15,13 @@ def get_spider_config():
 		import got3 as got
 		
 	#mongo
-	client = pymongo.MongoClient("101.132.114.125",29017)
+	client = pymongo.MongoClient("54.161.160.206",29017)
 	db = client.tweet
 	#db.authenticate(name='admin',password='lixiepeng')
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis("101.132.114.125", port=6379, db=0)
+	r = redis.StrictRedis("54.161.160.206", port=6379, db=0)
 
 
 	return got,db,r

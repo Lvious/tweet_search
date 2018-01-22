@@ -43,7 +43,6 @@ if __name__ == '__main__':
 	print 'craw_worker start!'
 	while True:
 		queue = r.lpop('task:korea')
-		queue_len = r.llen('task:korea')
 		if queue:
 			print 'craw_worker process!'
 			try:
@@ -51,12 +50,12 @@ if __name__ == '__main__':
 				db.korea_log.insert_one({'message':json.loads(queue),'status':1})
 			except Exception,e:
 				db.korea_log.insert_one({'message':json.loads(queue),'status':0,'error':e.message})
-			if queue_len == 0:
+			if r.llen('task:korea'):
 				message = {"is_last":True}
 				r.rpush('task:classify',json.dumps(message))
-			#else:
-				#message = {"is_last":False}
-				#r.rpush('task:classify',json.dumps(message))	
+			else:
+				message = {"is_last":False}
+				r.rpush('task:classify',json.dumps(message))
 
 		time.sleep(1)
 		print 'craw_worker wait!'

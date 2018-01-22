@@ -21,7 +21,7 @@ def get_spider_config():
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis("54.161.160.206", port=6379, db=0)
+	r = redis.StrictRedis(host="54.161.160.206", port=6379, db=0)
 
 
 	return got,db,r

@@ -7,49 +7,49 @@ _,db,r = get_fk_config()
 
 
 def get_location():
-    locs = db.event_metadata.find_one({"name":{"$eq":"location_group_by_char_5"}})
-    return list(set([" OR ".join(t) for t in locs]))
-    
+	locs = db.event_metadata.find_one({"name":{"$eq":"location_group_by_char_5"}})
+	return list(set([" OR ".join(t) for t in locs]))
+	
 def get_types():
-    types = db.event_metadata.find_one({"name":{"$eq":"type_group_by_char_5"}})
-    return list(set([" OR ".join(t) for t in types]))
+	types = db.event_metadata.find_one({"name":{"$eq":"type_group_by_char_5"}})
+	return list(set([" OR ".join(t) for t in types]))
 def get_users():
-    users = db.event_metadata.find_one({'name',{"$eq":"freq_users"}})
-    return list(set(users['data']))
-        
+	users = db.event_metadata.find_one({'name',{"$eq":"freq_users"}})
+	return list(set(users['data']))
+		
 
 def get_query_str(loc,types):
 	return '('+loc+')' +' '+'('+target+')'
 
 def get_task():
-    now = datetime.now()
-    WAIT_TIME_MINUTES = 15
-    locs = get_location()
-    types = get_types()
-    users = get_users()
-    while True:
-        for loc in locs:
-            for trigger in types:
-                q = get_query_str(loc,trigger)
-                message = {'q':q,'f':['&f=news','','&f=tweets'],'num':-1,
-                "sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME_MINUTES)).strftime("%Y-%m-%d %H:%M:%S"),
-                "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
-                }
-		        print(message)
-                r.rpush("task:fk",json.dumps(message))                
-        for user in users:
-            message = {'q':'from:'+user,'f':'&f=tweets','num':-1,
-                "sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME_MINUTES)).strftime("%Y-%m-%d %H:%M:%S"),
-                "untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
-            }
-            print(message)
-            r.rpush("task:fk",json.dumps(message))
-        time_gone = (datetime.now()-now).seconds
-        if time_gone < 60*WAIT_TIME_MINUTES:
-            time.sleep(60*WAIT_TIME_MINUTES-time_gone)
-            now = datetime.now()
-        else:
-            now = now+timedelta(minutes=WAIT_TIME_MINUTES)                     
+	now = datetime.now()
+	WAIT_TIME_MINUTES = 15
+	locs = get_location()
+	types = get_types()
+	users = get_users()
+	while True:
+		for loc in locs:
+			for trigger in types:
+				q = get_query_str(loc,trigger)
+				message = {'q':q,'f':['&f=news','','&f=tweets'],'num':-1,
+				"sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME_MINUTES)).strftime("%Y-%m-%d %H:%M:%S"),
+				"untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
+				}
+				print(message)
+				r.rpush("task:fk",json.dumps(message))				
+		for user in users:
+			message = {'q':'from:'+user,'f':'&f=tweets','num':-1,
+				"sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME_MINUTES)).strftime("%Y-%m-%d %H:%M:%S"),
+				"untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")
+			}
+			print(message)
+			r.rpush("task:fk",json.dumps(message))
+		time_gone = (datetime.now()-now).seconds
+		if time_gone < 60*WAIT_TIME_MINUTES:
+			time.sleep(60*WAIT_TIME_MINUTES-time_gone)
+			now = datetime.now()
+		else:
+			now = now+timedelta(minutes=WAIT_TIME_MINUTES)					 
 if __name__ == '__main__':
-    get_task()
+	get_task()
 

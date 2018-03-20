@@ -1,6 +1,6 @@
 import time
 import json
-    
+	
 import multiprocessing
 from multiprocessing import Pool
 
@@ -8,17 +8,17 @@ from Config import get_spider_config
 _,db,r = get_fk_config()
 
 def advance_search_dataset(q,f,num,s,u):
-    collection = db.fk
-    tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setSinceTimeStamp(s).setUntilTimeStamp(u).setMaxTweets(num)
-    tweets = got.manager.TweetManager.getTweets(tweetCriteria)
-    for tweet in tweets:
+	collection = db.fk
+	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setSinceTimeStamp(s).setUntilTimeStamp(u).setMaxTweets(num)
+	tweets = got.manager.TweetManager.getTweets(tweetCriteria)
+	for tweet in tweets:
 		if collection.find_one({'_id':tweet['id']}) == None:
-            collection.insert_one({'_id':tweet['id'],'tweet':tweet,'f':f,'q':q})
+			collection.insert_one({'_id':tweet['id'],'tweet':tweet,'f':f,'q':q})
 
 def run_dataset_task(message_data):
-    #message_data['f'] = #'' '&f=tweets' '&f=news' '&f=broadcasts' '&f=videos' '&f=images' '&f=users'
-    #message_data['q']  = #''
-    #message_data['num'] =10
+	#message_data['f'] = #'' '&f=tweets' '&f=news' '&f=broadcasts' '&f=videos' '&f=images' '&f=users'
+	#message_data['q']  = #''
+	#message_data['num'] =10
 	try:
 		q = message_data['q']
 		num = message_data['num']

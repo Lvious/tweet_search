@@ -73,7 +73,7 @@ def kmeans_best(X,X_train_tfidf=None,max_cluster_num=8):
 		socre = metrics.silhouette_score(X_train_tfidf, mbkm.labels_)
 		text_clusters.append((mbkm,socre))
 	return sorted(text_clusters,key=lambda i:i[1])[0]
-    
+	
 def get_topics_top_words(model, feature_names, n_top_words=20):
 	topics_top_words = {}
 	for topic_idx, topic in enumerate(model.components_):

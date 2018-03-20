@@ -14,7 +14,7 @@ def get_types():
 	types = db.event_metadata.find_one({"name":{"$eq":"type_group_by_char_5"}})
 	return list(set([" OR ".join(t) for t in types]))
 def get_users():
-	users = db.event_metadata.find_one({'name',{"$eq":"freq_users"}})
+	users = db.event_metadata.find_one({'name':{"$eq":"freq_users"}})
 	return list(set(users['data']))
 		
 

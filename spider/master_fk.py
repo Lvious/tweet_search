@@ -18,8 +18,8 @@ def get_users():
 	return list(set(users['data']))
 		
 
-def get_query_str(loc,types):
-	return '('+loc+')' +' '+'('+target+')'
+def get_query_str(loc,type):
+	return '('+loc+')' +' '+'('+type+')'
 
 def get_task():
 	now = datetime.now()

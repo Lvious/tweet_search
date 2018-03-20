@@ -18,7 +18,7 @@ from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 import sys
 sys.path.append("..")
 
-from spider.Config import get_spider_config
+from spider.Config import get_fk_config
 _,db,r = get_fk_config()
 
 from tqdm import tqdm

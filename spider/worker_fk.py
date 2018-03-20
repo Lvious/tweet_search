@@ -4,7 +4,7 @@ import json
 import multiprocessing
 from multiprocessing import Pool
 
-from Config import get_spider_config
+from Config import get_fk_config
 _,db,r = get_fk_config()
 
 def advance_search_dataset(q,f,num,s,u):

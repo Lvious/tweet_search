@@ -15,13 +15,13 @@ def get_spider_config():
 		import got3 as got
 		
 	#mongo
-	client = pymongo.MongoClient("54.161.160.206",29017)
+	client = pymongo.MongoClient(os.environ['MONGOHOST'],os.environ['MONGOPORT'])
 	db = client.tweet
 	#db.authenticate(name='admin',password='lixiepeng')
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis(host='54.161.160.206', port=6479, db=0)
+	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=os.environ['REDISPORT'], db=0)
 
 	return got,db,r
 
@@ -33,12 +33,12 @@ def get_fk_config():
 		import got3 as got
 		
 	#mongo
-	client = pymongo.MongoClient("54.161.160.206",27027)
-	db = client.terror
+	client = pymongo.MongoClient(os.environ['MONGOHOST'],os.environ['MONGOPORT'])
+	db = client.tweet
 	#db.authenticate(name='admin',password='lixiepeng')
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis(host='54.161.160.206', port=6479, db=0)
+	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=os.environ['REDISPORT'], db=0)
 
 	return got,db,r

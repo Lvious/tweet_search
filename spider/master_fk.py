@@ -19,7 +19,7 @@ def get_users():
 		
 
 def get_query_str(loc,type):
-	return '('+loc+')' +' '+'('+type+')'.encode('utf8')
+	return ('('+loc+')' +' '+'('+type+')').encode('utf8')
 
 def get_task():
 	now = datetime.now()

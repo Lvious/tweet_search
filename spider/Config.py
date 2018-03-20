@@ -21,7 +21,7 @@ def get_spider_config():
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=int(os.environ['MONGOPORT']), db=0)
+	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=int(os.environ['REDISPORT']), db=0)
 
 	return got,db,r
 
@@ -39,7 +39,7 @@ def get_fk_config():
 	
 	#redis
 	#r = redis.StrictRedis(host=os.environ['REDISHOST'], port=6379, db=0, password='lixiepeng')
-	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=int(os.environ['MONGOPORT']), db=0)
+	r = redis.StrictRedis(host=os.environ['REDISHOST'], port=int(os.environ['REDISPORT']), db=0)
 
 	return got,db,r
 

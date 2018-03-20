@@ -8,11 +8,11 @@ _,db,r = get_fk_config()
 
 def get_location():
 	locs = db.event_metadata.find_one({"name":{"$eq":"location_group_by_char_5"}})
-	return list(set([" OR ".join(t) for t in locs]))
+	return list(set([" OR ".join(t) for t in locs['data']]))
 	
 def get_types():
 	types = db.event_metadata.find_one({"name":{"$eq":"type_group_by_char_5"}})
-	return list(set([" OR ".join(t) for t in types]))
+	return list(set([" OR ".join(t) for t in types['data']]))
 def get_users():
 	users = db.event_metadata.find_one({'name':{"$eq":"freq_users"}})
 	return list(set(users['data']))
@@ -29,8 +29,8 @@ def get_task():
 	users = get_users()
 	while True:
 		for loc in locs:
-			for trigger in types:
-				q = get_query_str(loc,trigger)
+			for type in types:
+				q = get_query_str(loc,type)
 				message = {'q':q,'f':['&f=news','','&f=tweets'],'num':-1,
 				"sinceTimeStamp":(now - timedelta(minutes=WAIT_TIME_MINUTES)).strftime("%Y-%m-%d %H:%M:%S"),
 				"untilTimeStamp":now.strftime("%Y-%m-%d %H:%M:%S")

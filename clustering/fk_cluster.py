@@ -141,8 +141,8 @@ def clustering_offline():
 					{'$set': {'entity':ners,'cluster':{'cluster_label':0,'cluster_hash':cluster_hash}}}) for index,_id in tqdm(enumerate(ids))]
 					result = db.fk.bulk_write(requests)
 					pprint(result.bulk_api_result)
-					#db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],'clusters_size':-1})
-					db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[0],
+					#db.cluster_metadata_fk.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],'clusters_size':-1})
+					db.cluster_metadata_fk.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[0],
 						'texts_num':1,'clusters_size':{'0':1},'clusters_hashtags':hashtags,
 						'cluster_entities':ners,'order_centroids':texts,'topics':None})
 					print('none cluster!')
@@ -200,7 +200,7 @@ def clustering_offline():
 				for k,v in clusters_hashtags.iteritems():
 					clusters_hashtags[k] = [(i[0],i[1]) for i in Counter(v).most_common(5)]
 
-				db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],
+				db.cluster_metadata_fk.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],
 					'texts_num':len(texts),'clusters_size':clusters_counter_,'clusters_hashtags':clusters_hashtags,
 					'cluster_entities':cluster_entities,'order_centroids':centroids,'topics':lda_words})
 	
@@ -259,7 +259,7 @@ def clustering():
 	for k,v in clusters_hashtags.iteritems():
 		clusters_hashtags[k] = [(i[0],i[1]) for i in Counter(v).most_common(5)]
 
-	db.cluster_metadata.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],
+	db.cluster_metadata_fk.insert_one({'_id':cluster_hash,'start_time':dates[0],'end_time':dates[-1],
 		'texts_num':len(texts),'clusters_size':clusters_counter_,'clusters_hashtags':clusters_hashtags,
 		'cluster_entities':cluster_entities,'order_centroids':centroids,'topics':lda_words})
 

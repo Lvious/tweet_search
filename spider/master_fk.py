@@ -2,7 +2,7 @@ import re
 import json
 from datetime import datetime,timedelta
 
-from Config import get_spider_config
+from Config import get_fk_config
 _,db,r = get_fk_config()
 
 

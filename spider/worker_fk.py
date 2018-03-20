@@ -15,7 +15,7 @@ def advance_search_dataset(q,f,num,s,u):
 		if collection.find_one({'_id':tweet['id']}) == None:
 			collection.insert_one({'_id':tweet['id'],'tweet':tweet,'f':f,'q':q})
 
-def run_dataset_task(message_data):
+def run_fk_task(message_data):
 	#message_data['f'] = #'' '&f=tweets' '&f=news' '&f=broadcasts' '&f=videos' '&f=images' '&f=users'
 	#message_data['q']  = #''
 	#message_data['num'] =10
@@ -41,7 +41,7 @@ if __name__ == '__main__':
 		if queue:
 			print 'craw_worker process!'
 			try:
-				run_korea_task(json.loads(queue))
+				run_fk_task(json.loads(queue))
 				db.fk_log.insert_one({'message':json.loads(queue),'status':1})
 			except Exception,e:
 				db.fk_log.insert_one({'message':json.loads(queue),'status':0,'error':e.message})

@@ -8,7 +8,7 @@ from datetime import datetime,timedelta
 from Config import get_fk_config
 _,db,r = get_fk_config()
 
-def advance_search_dataset(q,f,num,s,u):
+def advance_search_fk(q,f,num,s,u):
 	collection = db.fk
 	tweetCriteria = got.manager.TweetCriteria().setQuerySearch(q).setTweetType(f).setSinceTimeStamp(s).setUntilTimeStamp(u).setMaxTweets(num)
 	tweets = got.manager.TweetManager.getTweets(tweetCriteria)
@@ -17,19 +17,16 @@ def advance_search_dataset(q,f,num,s,u):
 			collection.insert_one({'_id':tweet['id'],'tweet':tweet,'f':f,'q':q})
 
 def run_fk_task(message_data):
-	#message_data['f'] = #'' '&f=tweets' '&f=news' '&f=broadcasts' '&f=videos' '&f=images' '&f=users'
-	#message_data['q']  = #''
-	#message_data['num'] =10
 	try:
 		q = message_data['q']
 		num = message_data['num']
 		sinceTimeStamp = datetime.strptime(message_data['sinceTimeStamp'],"%Y-%m-%d %H:%M:%S")
 		untilTimeStamp = datetime.strptime(message_data['untilTimeStamp'],"%Y-%m-%d %H:%M:%S")
 		if type(message_data['f']) != list:
-			advance_search_korea(q,message_data['f'],num,sinceTimeStamp,untilTimeStamp)
+			advance_search_fk(q,message_data['f'],num,sinceTimeStamp,untilTimeStamp)
 		else:
 			pool = Pool(processes=multiprocessing.cpu_count())
-			[pool.apply(advance_search_korea,(q,f,num,sinceTimeStamp,untilTimeStamp)) for f in message_data['f']]
+			[pool.apply(advance_search_fk,(q,f,num,sinceTimeStamp,untilTimeStamp)) for f in message_data['f']]
 			pool.close()
 			pool.join()
 	except Exception,e:

@@ -12,12 +12,13 @@ import multiprocessing
 from multiprocessing.dummy import Pool
 
 from pprint import pprint
-import pymongo
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 
-from Config import get_spider_config
-_,db,r = get_fk_config()
+import sys
+sys.path.append("..")
 
+from spider.Config import get_spider_config
+_,db,r = get_fk_config()
 
 re_prob = re.compile('(?:__label__(\d)\s([^_]+)[\s]*)')
 def batch_ftpredict(texts):

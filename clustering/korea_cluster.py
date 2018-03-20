@@ -12,11 +12,13 @@ from sklearn.decomposition import LatentDirichletAllocation
 from sklearn import metrics
 
 from pprint import pprint
-import pymongo
 from pymongo import InsertOne, DeleteMany, ReplaceOne, UpdateOne
 
-from Config import get_spider_config
-_,db,r = get_spider_config()
+import sys
+sys.path.append("..")
+
+from spider.Config import get_spider_config
+_,db,r = get_fk_config()
 
 from tqdm import tqdm
 
